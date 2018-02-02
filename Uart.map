@@ -1,0 +1,549 @@
+
+Allocating common symbols
+Common symbol       size              file
+
+timer_test          0x1               ttimer.o
+t_timerid           0x4               ttimer.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+MEM              0x17a00000         0x00010000
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crti.o
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+LOAD arch/crt0.o
+LOAD arch/entry.o
+LOAD main.o
+LOAD ttimer.o
+LOAD tintc.o
+LOAD tuart.o
+LOAD drivers/drivers.o
+LOAD lib/lib.o
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/../../../../csky-abiv2-elf/lib/libm.a
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/../../../../csky-abiv2-elf/lib/libc.a
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/libgcc.a
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+LOAD /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtn.o
+                0x17a00000                PROVIDE (__origin, 0x17a00000)
+                0x00010000                PROVIDE (__length, 0x10000)
+                0x179feff8                PROVIDE (__stack, 0x179feff8)
+
+.text           0x17a00000     0x3890
+                0x17a00000                . = ALIGN (0x4)
+ *(.exp_table)
+ .exp_table     0x17a00000      0x200 arch/crt0.o
+                0x17a00000                ckcpu_vsr_table
+                0x17a00200                __stext = .
+ *(.text)
+ .text          0x17a00200        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crti.o
+ .text          0x17a00200       0x96 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ *fill*         0x17a00296        0x2 00
+ .text          0x17a00298       0x78 arch/crt0.o
+                0x17a00298                __start
+ .text          0x17a00310      0x102 arch/entry.o
+                0x17a00310                default_exception_handler
+                0x17a00318                hw_vsr_default_exception
+                0x17a00378                hw_vsr_autovec
+                0x17a003d4                hw_vsr_fastautovec
+ *fill*         0x17a00412        0x2 00
+ .text          0x17a00414       0x74 main.o
+                0x17a00464                main
+ .text          0x17a00488      0x194 ttimer.o
+                0x17a00488                CK_TIMER_Handler
+                0x17a004cc                CK_Timer_Test
+ .text          0x17a0061c      0x9fc tintc.o
+                0x17a0061c                CK_Normal0_Handler
+                0x17a00650                CK_Normal63_Handler
+                0x17a00690                CK_Fast0_Handler
+                0x17a006c4                CK_Fast63_Handler
+                0x17a00704                CK_Normal0_Vector_Handler
+                0x17a00794                CK_Normal63_Vector_Handler
+                0x17a00838                CK_Fast0_Vector_Handler
+                0x17a00898                CK_Fast63_Vector_Handler
+                0x17a008f8                CK_INTC_AV_Mode_Test
+                0x17a00bb4                CK_INTC_SHARE_Mode_Test
+                0x17a00d2c                CK_INTC_UNIQUE_Mode_Test
+                0x17a00ffc                CK_INTC_Test
+ .text          0x17a01018      0x4f8 tuart.o
+                0x17a01480                CK_UART_Test
+ .text          0x17a01510     0x1994 drivers/drivers.o
+                0x17a01510                CK_Deactive_TimerModule
+                0x17a0151c                CK_Timer_Init
+                0x17a01524                CK_Timer_Open
+                0x17a015e8                CK_Timer_Close
+                0x17a01670                CK_Timer_Start
+                0x17a01738                CK_Timer_Stop
+                0x17a01790                CK_Timer_ClearIrqFlag
+                0x17a017c0                CK_Timer_CurrentValue
+                0x17a01814                CK_INTC_Init
+                0x17a019b8                CK_INTC_EnNormalIrq
+                0x17a01a14                CK_INTC_DisNormalIrq
+                0x17a01a74                CK_INTC_EnFastIrq
+                0x17a01ad0                CK_INTC_DisFastIrq
+                0x17a01b34                CK_INTC_MaskNormalIrq
+                0x17a01bb8                CK_INTC_UnMaskNormalIrq
+                0x17a01c14                CK_INTC_MaskFastIrq
+                0x17a01c7c                CK_INTC_UnMaskFastIrq
+                0x17a01cdc                CK_INTC_RequestIrq
+                0x17a01f38                CK_INTC_FreeIrq
+                0x17a021a4                CK_Default_Exception_Handler
+                0x17a021c8                CK_Exception_Init
+                0x17a0220c                CK_INTC_InterruptService
+                0x17a02260                CK_INTC_FastInterruptService
+                0x17a022b4                CK_CPU_EnAllNormalIrq
+                0x17a022bc                CK_CPU_DisAllNormalIrq
+                0x17a022c4                CK_CPU_EnAllFastIrq
+                0x17a022cc                CK_CPU_DisAllFastIrq
+                0x17a022d4                CK_CPU_EnterCritical
+                0x17a022ec                CK_CPU_ExitCritical
+                0x17a02320                CK_Deactive_UartModule
+                0x17a02378                CK_Uart_Init
+                0x17a023cc                CK_Uart_Open
+                0x17a024b0                CK_Uart_Close
+                0x17a02524                CK_Uart_ChangeBaudrate
+                0x17a0267c                CK_Uart_SetParity
+                0x17a02780                CK_Uart_SetStopBit
+                0x17a02838                CK_Uart_SetWordSize
+                0x17a02960                CK_Uart_SetTXMode
+                0x17a02a0c                CK_Uart_SetRXMode
+                0x17a02ab8                CK_Uart_DriverInit
+                0x17a02acc                CK_Uart_GetChar
+                0x17a02b68                CK_Uart_GetCharUnBlock
+                0x17a02c04                CK_Uart_PutChar
+                0x17a02e6c                CK_UART_ClearRxBuffer
+ .text          0x17a02ea4      0x988 lib/lib.o
+                0x17a02ea4                invertchar
+                0x17a02efc                tolower
+                0x17a02f6c                toupper
+                0x17a02fdc                asciitobcd
+                0x17a0306c                asciitohex
+                0x17a030dc                asciitodec
+                0x17a03150                asciitonum
+                0x17a031b4                delay
+                0x17a031e8                CK_WaitForReply
+                0x17a0332c                CK_CircleBuffer_Init
+                0x17a03368                CK_CircleBuffer_Clear
+                0x17a03388                CK_CircleBuffer_IsEmpty
+                0x17a033a4                CK_CircleBuffer_IsFull
+                0x17a033d0                CK_CircleBuffer_Read
+                0x17a0342c                CK_CircleBuffer_Write
+                0x17a035c0                putchar
+                0x17a035ec                puts
+                0x17a03688                getchar
+                0x17a036b4                printf
+ .text          0x17a0382c       0x26 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+ .text          0x17a03852        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtn.o
+ *(.text*)
+ *(.text.*)
+ *(.gnu.warning)
+ *(.stub)
+ *(.gnu.linkonce.t*)
+ *(.glue_7t)
+ *(.glue_7)
+ *(.jcr)
+ *fill*         0x17a03852        0x2 00
+ .jcr           0x17a03854        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ .jcr           0x17a03854        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+ *(.init)
+ .init          0x17a03858        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crti.o
+                0x17a03858                _init
+ .init          0x17a03860        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ .init          0x17a03868        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+ .init          0x17a03870        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtn.o
+ *(.fini)
+ .fini          0x17a03878        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crti.o
+                0x17a03878                _fini
+ .fini          0x17a03880        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ .fini          0x17a03888        0x8 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtn.o
+                0x17a03890                . = ALIGN (0x4)
+                0x17a03890                PROVIDE (__ctbp, .)
+ *(.call_table_data)
+ *(.call_table_text)
+                0x17a03890                . = ALIGN (0x10)
+                0x17a03890                __etext = .
+
+.rodata         0x17a03890      0xc00
+                0x17a03890                . = ALIGN (0x4)
+                0x17a03890                __srodata = .
+ *(.rdata)
+ *(.rdata*)
+ *(.rdata1)
+ *(.rdata.*)
+ *(.rodata)
+ .rodata        0x17a03890        0x2 main.o
+ *fill*         0x17a03892        0x2 00
+ .rodata        0x17a03894      0x108 ttimer.o
+ .rodata        0x17a0399c      0x492 tintc.o
+ *fill*         0x17a03e2e        0x2 00
+ .rodata        0x17a03e30      0x275 tuart.o
+ *fill*         0x17a040a5        0x3 00
+ .rodata        0x17a040a8      0x372 drivers/drivers.o
+ *fill*         0x17a0441a        0x2 00
+ .rodata        0x17a0441c       0x6c lib/lib.o
+ *(.rodata1)
+ *(.rodata*)
+ *(.rodata.*)
+ *(.rodata.str1.4)
+                0x17a04490                . = ALIGN (0x10)
+ *fill*         0x17a04488        0x8 00
+                0x17a04490                __erodata = .
+
+.data           0x17a04490     0x4260
+                0x17a04490                . = ALIGN (0x4)
+                0x17a04490                __sdata = .
+                0x17a04490                __data_start = .
+                0x17a04490                data_start = .
+ *(.got.plt)
+ *(.got)
+ FILL mask 0x00000000
+                0x17a044a0                . = ALIGN (0x20)
+ *fill*         0x17a04490       0x10 00000000
+                0x17a044a0        0x4 LONG 0xffffffff
+                0x17a044c0                . = ALIGN (0x20)
+ *fill*         0x17a044a4       0x1c 00000000
+ *(.gnu.linkonce.r*)
+ *(.data)
+ .data          0x17a044c0        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crti.o
+ .data          0x17a044c0        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+                0x17a044c0                __dso_handle
+ .data          0x17a044c4        0x0 arch/crt0.o
+ .data          0x17a044c4        0x0 arch/entry.o
+ .data          0x17a044c4        0x0 main.o
+ .data          0x17a044c4        0x4 ttimer.o
+                0x17a044c4                icrp_timer
+ .data          0x17a044c8       0x95 tintc.o
+                0x17a04558                icrp_intc
+ *fill*         0x17a0455d        0x3 00
+ .data          0x17a04560        0xe tuart.o
+                0x17a04560                data
+ *fill*         0x17a0456e        0x2 00
+ .data          0x17a04570     0x4178 drivers/drivers.o
+                0x17a0459c                icrp
+ .data          0x17a086e8        0x0 lib/lib.o
+ .data          0x17a086e8        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+ .data          0x17a086e8        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtn.o
+ *(.data*)
+ *(.data1)
+ *(.data.*)
+ *(.gnu.linkonce.d*)
+ *(.data1)
+ *(.gcc_except_table)
+ *(.gcc_except_table*)
+ *(.sdata)
+ *(.sdata.*)
+ *(.gnu.linkonce.s.*)
+ *(__libc_atexit)
+ *(__libc_subinit)
+ *(__libc_subfreeres)
+ *(.note.ABI-tag)
+                0x17a086f0                . = ALIGN (0x10)
+ *fill*         0x17a086e8        0x8 00000000
+                0x17a086f0                __edata = .
+
+.bss            0x17a086f0      0x230
+                0x17a086f0                . = ALIGN (0x4)
+                0x17a086f0                __sbss = ALIGN (0x4)
+                0x17a086f0                __bss_start = .
+ *(.dynsbss)
+ *(.sbss)
+ *(.sbss.*)
+ *(.scommon)
+ *(.dynbss)
+ *(.bss)
+ .bss           0x17a086f0        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crti.o
+ .bss           0x17a086f0       0x20 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ .bss           0x17a08710        0x0 arch/crt0.o
+ .bss           0x17a08710        0x0 arch/entry.o
+ .bss           0x17a08710        0x4 main.o
+                0x17a08710                consoleuart
+ .bss           0x17a08714        0x0 ttimer.o
+ .bss           0x17a08714        0x0 tintc.o
+ .bss           0x17a08714        0x0 tuart.o
+ .bss           0x17a08714      0x200 drivers/drivers.o
+ .bss           0x17a08914        0x0 lib/lib.o
+ .bss           0x17a08914        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+ .bss           0x17a08914        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtn.o
+ *(.bss.*)
+ *(COMMON)
+ COMMON         0x17a08914        0x8 ttimer.o
+                0x17a08914                timer_test
+                0x17a08918                t_timerid
+                0x17a08920                . = ALIGN (0x10)
+ *fill*         0x17a0891c        0x4 00
+                0x17a08920                __ebss = .
+                0x17a08920                __end = .
+                0x17a08920                end = .
+
+.eh_frame       0x17a08920        0x4
+ *(.eh_frame)
+ .eh_frame      0x17a08920        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ .eh_frame      0x17a08920        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.eh_frame
+ *(.eh_frame)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+
+.preinit_array  0x00000000        0x0
+                0x00000000                PROVIDE (__preinit_array_start, .)
+ *(.preinit_array)
+                0x00000000                PROVIDE (__preinit_array_end, .)
+
+.init_array     0x00000000        0x0
+                0x00000000                PROVIDE (__init_array_start, .)
+ *(SORT(.init_array.*))
+ *(.init_array)
+                0x00000000                PROVIDE (__init_array_end, .)
+
+.fini_array     0x00000000        0x0
+                0x00000000                PROVIDE (__fini_array_start, .)
+ *(.fini_array)
+ *(SORT(.fini_array.*))
+                0x00000000                PROVIDE (__fini_array_end, .)
+
+.ctors          0x17a08924        0x8
+ *crtbegin.o(.ctors)
+ .ctors         0x17a08924        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT(.ctors.*))
+ *(.ctors)
+ .ctors         0x17a08928        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+
+.dtors          0x17a0892c        0x8
+ *crtbegin.o(.dtors)
+ .dtors         0x17a0892c        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT(.dtors.*))
+ *(.dtors)
+ .dtors         0x17a08930        0x4 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+                0x17a08930                __DTOR_END__
+
+.junk           0x00000000        0x0
+ *(.rel*)
+ .rela.text     0x00000000        0x0 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ *(.rela*)
+
+.csky_stack_size
+                0x00000000      0x374
+ .csky_stack_size
+                0x00000000       0x24 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+ *fill*         0x00000024        0xc 00
+ .csky_stack_size
+                0x00000030       0x24 main.o
+ *fill*         0x00000054        0xc 00
+ .csky_stack_size
+                0x00000060       0x14 ttimer.o
+ *fill*         0x00000074        0xc 00
+ .csky_stack_size
+                0x00000080       0x64 tintc.o
+ *fill*         0x000000e4        0xc 00
+ .csky_stack_size
+                0x000000f0       0x2c tuart.o
+ *fill*         0x0000011c        0x4 00
+ .csky_stack_size
+                0x00000120      0x164 drivers/drivers.o
+ *fill*         0x00000284        0xc 00
+ .csky_stack_size
+                0x00000290       0xc4 lib/lib.o
+ *fill*         0x00000354        0xc 00
+ .csky_stack_size
+                0x00000360       0x14 /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+
+.stab           0x00000000      0x624
+ *(.stab)
+ .stab          0x00000000      0x1e0 arch/crt0.o
+ .stab          0x000001e0      0x444 arch/entry.o
+                                0x450 (size before relaxing)
+
+.stabstr        0x00000000       0x8f
+ *(.stabstr)
+ .stabstr       0x00000000       0x8f arch/crt0.o
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000       0x3e
+ *(.comment)
+ .comment       0x00000000       0x3e /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtbegin.o
+                                 0x3f (size before relaxing)
+ .comment       0x00000000       0x3f main.o
+ .comment       0x00000000       0x3f ttimer.o
+ .comment       0x00000000       0x3f tintc.o
+ .comment       0x00000000       0x3f tuart.o
+ .comment       0x00000000       0xbd drivers/drivers.o
+ .comment       0x00000000       0xbd lib/lib.o
+ .comment       0x00000000       0x3f /csky-abiv2-elf-tools/bin/../lib/gcc/csky-abiv2-elf/4.5.1/crtend.o
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000      0x140
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x20 main.o
+ .debug_aranges
+                0x00000020       0x20 ttimer.o
+ .debug_aranges
+                0x00000040       0x20 tintc.o
+ .debug_aranges
+                0x00000060       0x20 tuart.o
+ .debug_aranges
+                0x00000080       0x60 drivers/drivers.o
+ .debug_aranges
+                0x000000e0       0x60 lib/lib.o
+
+.debug_pubnames
+                0x00000000      0x7d7
+ *(.debug_pubnames)
+ .debug_pubnames
+                0x00000000       0x2b main.o
+ .debug_pubnames
+                0x0000002b       0x65 ttimer.o
+ .debug_pubnames
+                0x00000090      0x153 tintc.o
+ .debug_pubnames
+                0x000001e3       0x2c tuart.o
+ .debug_pubnames
+                0x0000020f      0x448 drivers/drivers.o
+ .debug_pubnames
+                0x00000657      0x180 lib/lib.o
+
+.debug_info     0x00000000     0x2716
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000      0x132 main.o
+ .debug_info    0x00000132      0x25c ttimer.o
+ .debug_info    0x0000038e      0x47a tintc.o
+ .debug_info    0x00000808      0x2f9 tuart.o
+ .debug_info    0x00000b01     0x1498 drivers/drivers.o
+ .debug_info    0x00001f99      0x77d lib/lib.o
+
+.debug_abbrev   0x00000000      0xbf7
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000       0xd0 main.o
+ .debug_abbrev  0x000000d0      0x103 ttimer.o
+ .debug_abbrev  0x000001d3      0x1a1 tintc.o
+ .debug_abbrev  0x00000374      0x101 tuart.o
+ .debug_abbrev  0x00000475      0x4be drivers/drivers.o
+ .debug_abbrev  0x00000933      0x2c4 lib/lib.o
+
+.debug_line     0x00000000     0x2e44
+ *(.debug_line)
+ .debug_line    0x00000000      0x165 main.o
+ .debug_line    0x00000165      0x223 ttimer.o
+ .debug_line    0x00000388      0x7f0 tintc.o
+ .debug_line    0x00000b78      0x4c9 tuart.o
+ .debug_line    0x00001041     0x14dc drivers/drivers.o
+ .debug_line    0x0000251d      0x927 lib/lib.o
+
+.debug_frame    0x00000000      0x8ac
+ *(.debug_frame)
+ .debug_frame   0x00000000       0x70 main.o
+ .debug_frame   0x00000070       0x44 ttimer.o
+ .debug_frame   0x000000b4      0x134 tintc.o
+ .debug_frame   0x000001e8       0x88 tuart.o
+ .debug_frame   0x00000270      0x418 drivers/drivers.o
+ .debug_frame   0x00000688      0x224 lib/lib.o
+
+.debug_str      0x00000000      0xd16
+ *(.debug_str)
+ .debug_str     0x00000000      0x127 main.o
+                                0x145 (size before relaxing)
+ .debug_str     0x00000127       0xd7 ttimer.o
+                                0x17d (size before relaxing)
+ .debug_str     0x000001fe      0x1a9 tintc.o
+                                0x304 (size before relaxing)
+ .debug_str     0x000003a7      0x114 tuart.o
+                                0x1e8 (size before relaxing)
+ .debug_str     0x000004bb      0x685 drivers/drivers.o
+                                0xb74 (size before relaxing)
+ .debug_str     0x00000b40      0x1d6 lib/lib.o
+                                0x43e (size before relaxing)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo  0x00000000    0x1601f
+ *(.debug_macinfo)
+ .debug_macinfo
+                0x00000000     0x27fb main.o
+ .debug_macinfo
+                0x000027fb     0x2876 ttimer.o
+ .debug_macinfo
+                0x00005071     0x284d tintc.o
+ .debug_macinfo
+                0x000078be     0x21f7 tuart.o
+ .debug_macinfo
+                0x00009ab5     0x7de8 drivers/drivers.o
+ .debug_macinfo
+                0x0001189d     0x4782 lib/lib.o
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+                0x00000000      0x597
+ *(.debug_pubtypes)
+ .debug_pubtypes
+                0x00000000       0x31 main.o
+ .debug_pubtypes
+                0x00000031       0x5f ttimer.o
+ .debug_pubtypes
+                0x00000090       0xc9 tintc.o
+ .debug_pubtypes
+                0x00000159       0x68 tuart.o
+ .debug_pubtypes
+                0x000001c1      0x2da drivers/drivers.o
+ .debug_pubtypes
+                0x0000049b       0xfc lib/lib.o
+
+.debug_ranges
+ *(.debug_ranges)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+OUTPUT(Uart.elf elf32-csky-little)
