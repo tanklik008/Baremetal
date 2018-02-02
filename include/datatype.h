@@ -86,6 +86,17 @@ typedef struct
 #define  OUT
 #define INOUT
 
+#define read_mreg32( addr )				*(volatile unsigned int *)(addr)
+#define write_mreg32( addr, val)		*(volatile unsigned int *)(addr)= (volatile unsigned int)(val)
+#define read_mreg16( addr )				*(volatile unsigned short *)(addr)
+#define write_mreg16( addr, val)		*(volatile unsigned short *)(addr) = (volatile unsigned short)(val)
+#define read_mreg8( addr )				*(volatile unsigned char *)(addr)
+#define write_mreg8( addr, val)			*(volatile unsigned char *)(addr) = (volatile unsigned char)(val)
+#define write_iram32( addr, val)		*(volatile unsigned int *)(addr) = (val)
+#define write_iram16( addr,	val)		*(volatile unsigned short *)(addr) =(val)
+#define read_iram32(addr)				*(volatile unsigned int *)(addr)
+#define read_iram16(addr)				*(volatile unsigned short *)(addr)
+
 ///////////////////////////////////////////////////////////////////////////////////////
 #endif  // __DATATYPE_H__
 ///////////////////////////////////////////////////////////////////////////////////////
