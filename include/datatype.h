@@ -63,6 +63,11 @@ typedef unsigned short	    WORD;
 #define CK_SREG CK_UINT16
 #define CK_CREG CK_UINT8
 
+#define ALIGN_4 __attribute__((aligned (4)))
+#define ALIGN_32 __attribute__((aligned (32)))
+#define ALIGN_256 __attribute__((aligned (256)))
+#define INT_DATA __attribute((section(".intdata, \"aw\"")))
+
 // FIXME:
 typedef struct
 {

@@ -74,7 +74,7 @@
 #define CK_POWM_ADDRBASE			(volatile CK_UINT32 *)(0x10002000+PERI_BASE)
 
 /** Define DMA control base address **/
-#define CK_AHB_DMAC_CONTROL_BASEADDR	(volatile CK_UINT32 *)(0xFC10_0000+PERI_BASE)
+#define CK_AHB_DMAC_CONTROL_BASEADDR	(volatile CK_UINT32 *)(0xFC100000+PERI_BASE)
 
 /****** USBD  *************/
 #define CK_USBD_ADDRBASE			(volatile CK_UINT32 *)(0x10005000+PERI_BASE)
