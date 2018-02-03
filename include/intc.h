@@ -42,7 +42,7 @@ typedef struct {
 } CKStruct_INTCTestInfo, * PCKStruct_INTCTestInfo;
 
 // VSR table
-extern  volatile unsigned int ckcpu_vsr_table[128];
+extern  volatile unsigned int ckcpu_vsr_table[256] ALIGN_4;
 /* Statement of those functions which are used in intc.c*/
 void CK_CPU_EnAllNormalIrq(void);
 void CK_CPU_DisAllNormalIrq(void);
@@ -65,41 +65,61 @@ CK_INT32 CK_INTC_FreeIrq(INOUT PCKStruct_IRQHandler priqhandler, IN CK_UINT32 mo
 /* save context */
 #define IRQ_HANDLER_START()  \
 asm (  \
-	"subi    sp, 28\n\t"   \
-	"stw     a0, (sp, 0)\n\t"   \
-	"stw     a1, (sp, 4)\n\t"   \
-	"stw     a2, (sp, 8)\n\t"   \
-	"stw     a3, (sp, 12)\n\t"   \
-	"stw     t0, (sp, 16)\n\t"   \
-	"stw     t1, (sp, 20)\n\t"   \
-	"stw     lr, (sp, 24)\n\t"   \
+    "subi    sp, 124\n\t"   \ 
+    "stw     r0, (sp, 0)\n\t"   \
+    "stw     r1, (sp, 4)\n\t"   \
+    "stw     r2, (sp, 8)\n\t"   \
+    "stw     r3, (sp, 12)\n\t"   \
+    "stw     r4, (sp, 16)\n\t"   \
+    "stw     r5, (sp, 20)\n\t"   \
+    "stw     r6, (sp, 24)\n\t"   \
+    "stw     r7, (sp, 28)\n\t"   \
+    "stw     r8, (sp, 32)\n\t"   \
+    "stw     r9, (sp, 36)\n\t"   \
+    "stw     r10, (sp, 40)\n\t"   \
+    "stw     r11, (sp, 44)\n\t"   \
+    "stw     r12, (sp, 48)\n\t"   \
+    "stw     r13, (sp, 52)\n\t"   \
+    "stw     r15, (sp, 56)\n\t"   \
+    "stw     r16, (sp, 60)\n\t"   \
+    "stw     r17, (sp, 64)\n\t"   \
+    "stw     r18, (sp, 68)\n\t"   \
+    "stw     r19, (sp, 72)\n\t"   \
+    "stw     r20, (sp, 76)\n\t"   \
+    "stw     r21, (sp, 80)\n\t"   \
+    "stw     r22, (sp, 84)\n\t"   \
+    "stw     r23, (sp, 88)\n\t"   \
+    "stw     r24, (sp, 92)\n\t"   \
+    "stw     r25, (sp, 96)\n\t"   \
+    "stw     r26, (sp, 100)\n\t"   \
+    "stw     r27, (sp, 104)\n\t"   \
+    "stw     r28, (sp, 108)\n\t"   \
+    "stw     r29, (sp, 112)\n\t"   \
+    "stw     r30, (sp, 116)\n\t"   \
+    "stw     r31, (sp, 120)\n\t"   \
 \
-	"subi    sp, 8\n\t"   \
-	"mfcr    a3, epsr\n\t"   \
-	"stw     a3, (sp, 4)\n\t"   \
-	"mfcr    a2, epc\n\t"   \
-	"stw     a2, (sp, 0)\n\t"   \
+    "subi    sp, 8\n\t"   \
+    "mfcr    r2, epsr\n\t"   \
+    "stw     r2, (sp,4)\n\t"   \
+    "mfcr    r2, epc\n\t"   \
+    "stw     r2, (sp,0)\n\t"   \
 )
 
 /*   Restore the psr and pc     */
 #define IRQ_HANDLER_END()   \
 asm (   \
-	"ldw     a3, (sp, 0)\n\t"  \
-	"mtcr    a3, epc\n\t"  \
-	"ldw     a2, (sp, 4)\n\t"   \
-	"mtcr    a2, epsr\n\t"   \
-	"addi    sp, 8\n\t"   \
+    "ldw     r2, (sp,0)\n\t"  \
+    "mtcr    r2, epc\n\t"  \
+    "ldw     r2, (sp,4)\n\t"  \
+    "mtcr    r2, epsr\n\t"  \
+    "addi    sp, 8\n\t"  \
 \
-	"ldw     a0, (sp, 0)\n\t"   \
-	"ldw     a1, (sp, 4)\n\t"   \
-	"ldw     a2, (sp, 8)\n\t"   \
-	"ldw     a3, (sp, 12)\n\t"   \
-	"ldw     t0, (sp, 16)\n\t"   \
-	"ldw     t1, (sp, 20)\n\t"   \
-	"ldw     lr, (sp, 24)\n\t"   \
-	"addi    sp, 28\n\t"   \
+    "ldm     r0-r13,(sp)\n\t"  \
+    "addi    sp,56\n\t"  \
+    "ldm     r15-r31,(sp)\n\t"  \
+    "addi    sp,68\n\t"  \
 \
-	"rte"   \
+    "rte"  \
 )
 
 /*
@@ -109,27 +129,47 @@ asm (   \
 /* do nothing */
 #define FIQ_HANDLER_START()\
 asm (  \
-	"subi    sp, 28\n\t"   \
-	"stw     a0, (sp, 0)\n\t"   \
-	"stw     a1, (sp, 4)\n\t"   \
-	"stw     a2, (sp, 8)\n\t"   \
-	"stw     a3, (sp, 12)\n\t"   \
-	"stw     t0, (sp, 16)\n\t"   \
-	"stw     t1, (sp, 20)\n\t"   \
-	"stw     lr, (sp, 24)\n\t"   \
+"subi    sp, 124\n\t"   \ 
+    "stw     r0, (sp, 0)\n\t"   \
+    "stw     r1, (sp, 4)\n\t"   \
+    "stw     r2, (sp, 8)\n\t"   \
+    "stw     r3, (sp, 12)\n\t"   \
+    "stw     r4, (sp, 16)\n\t"   \
+    "stw     r5, (sp, 20)\n\t"   \
+    "stw     r6, (sp, 24)\n\t"   \
+    "stw     r7, (sp, 28)\n\t"   \
+    "stw     r8, (sp, 32)\n\t"   \
+    "stw     r9, (sp, 36)\n\t"   \
+    "stw     r10, (sp, 40)\n\t"   \
+    "stw     r11, (sp, 44)\n\t"   \
+    "stw     r12, (sp, 48)\n\t"   \
+    "stw     r13, (sp, 52)\n\t"   \
+    "stw     r15, (sp, 56)\n\t"   \
+    "stw     r16, (sp, 60)\n\t"   \
+    "stw     r17, (sp, 64)\n\t"   \
+    "stw     r18, (sp, 68)\n\t"   \
+    "stw     r19, (sp, 72)\n\t"   \
+    "stw     r20, (sp, 76)\n\t"   \
+    "stw     r21, (sp, 80)\n\t"   \
+    "stw     r22, (sp, 84)\n\t"   \
+    "stw     r23, (sp, 88)\n\t"   \
+    "stw     r24, (sp, 92)\n\t"   \
+    "stw     r25, (sp, 96)\n\t"   \
+    "stw     r26, (sp, 100)\n\t"   \
+    "stw     r27, (sp, 104)\n\t"   \
+    "stw     r28, (sp, 108)\n\t"   \
+    "stw     r29, (sp, 112)\n\t"   \
+    "stw     r30, (sp, 116)\n\t"   \
+    "stw     r31, (sp, 120)\n\t"   \
 )
 
 /*   Restore the psr and pc     */
 #define FIQ_HANDLER_END()  \
 asm (   \
-    "ldw     a0, (sp, 0)\n\t"   \
-	"ldw     a1, (sp, 4)\n\t"   \
-	"ldw     a2, (sp, 8)\n\t"   \
-	"ldw     a3, (sp, 12)\n\t"   \
-	"ldw     t0, (sp, 16)\n\t"   \
-	"ldw     t1, (sp, 20)\n\t"   \
-	"ldw     lr, (sp, 24)\n\t"   \
-	"addi    sp, 28\n\t"   \
+    "ldm     r0-r13,(sp)\n\t"  \
+    "addi    sp,56\n\t"  \
+    "ldm     r15-r31,(sp)\n\t"  \
+    "addi    sp,68\n\t"  \
 \
 	"rfi"   \
 )
