@@ -48,7 +48,7 @@
 ckcpu_vsr_table:
 	.long	__start
 .align 2
-.rept 255
+.rept 256
 	.long	default_exception_handler
 .endr
 
