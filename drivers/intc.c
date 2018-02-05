@@ -31,8 +31,8 @@
  * fast_irq_list[NR_IRQS]: All the fast interrupt service routines should been
  *                         registered in this list.
  */
-static PCKStruct_IRQHandler  normal_irq_list[NR_IRQS] ALIGN_4;
-static PCKStruct_IRQHandler  fast_irq_list[NR_IRQS] ALIGN_4;
+static PCKStruct_IRQHandler  normal_irq_list[NR_IRQS];
+static PCKStruct_IRQHandler  fast_irq_list[NR_IRQS];
 
 /* PCK_INTC: The base address of interrupt controller registers */
 volatile CKStruct_INTC *icrp = PCK_INTC;
@@ -77,11 +77,13 @@ typedef struct
     CK_UINT32 r15;
 } __attribute__ ((aligned, packed)) Ckcore_SavedRegisters;
 
-
+extern void default_exception_handler();
 extern void hw_vsr_default_exception();
 extern void hw_vsr_autovec();
 extern void hw_vsr_fastautovec();
 extern void hw_vsr_tlbmiss();
+extern void hw_vsr_vec();
+extern void hw_vsr_fastvec();
 
 /*************************************************************************** 
 This function initializes normal_irq_list[NR_IRQS], fast_irq_list[NR_IRQS]
@@ -140,7 +142,7 @@ void CK_INTC_Init(IN CK_UINT32 mode)
     icrp->PR[13] = 0x34353637;
     icrp->PR[14] = 0x38393a3b;
     icrp->PR[15] = 0x3c3d3e3f;
-    printf("JJJ_DEBUG CK_INTC_Init ICR_ISR=0x%x\n", icrp->ICR_ISR);
+    //JJJ_DEBUG printf("JJJ_DEBUG CK_INTC_Init ICR_ISR=0x%x\n", icrp->ICR_ISR);
 }
 
 /******************************************************************
@@ -155,10 +157,14 @@ void CK_INTC_EnNormalIrq(IN CK_UINT32 irq_num) {
 	CK_CPU_EnterCritical(&psrbk);
 	if (irq_num > 31) {
 		icrp->NIERH |= (1 << (irq_num - 32));
-        printf("JJJ_DEBUG CK_INTC_EnNormalIrq NIERH = 0x%x\n", icrp->NIERH);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_EnNormalIrq NIERH = 0x%x\n", icrp->NIERH);
+        #endif
 	} else {
 		icrp->NIERL |= (1 << irq_num);
-        printf("JJJ_DEBUG CK_INTC_EnNormalIrq NIERL = 0x%x\n", icrp->NIERL);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_EnNormalIrq NIERL = 0x%x\n", icrp->NIERL);
+        #endif
 	}
 	CK_CPU_ExitCritical(psrbk);
 }
@@ -175,10 +181,14 @@ void CK_INTC_DisNormalIrq(IN CK_UINT32 irq_num) {
 	CK_CPU_EnterCritical(&psrbk);
 	if (irq_num > 31) {
 		icrp->NIERH &= ~(1 << (irq_num - 32));
-        printf("JJJ_DEBUG CK_INTC_DisNormalIrq NIERH = 0x%x\n", icrp->NIERH);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_DisNormalIrq NIERH = 0x%x\n", icrp->NIERH);
+        #endif
 	} else {
 		icrp->NIERL &= ~(1 << irq_num);
-        printf("JJJ_DEBUG CK_INTC_DisNormalIrq NIERL = 0x%x\n", icrp->NIERL);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_DisNormalIrq NIERL = 0x%x\n", icrp->NIERL);
+        #endif
 	}
 	CK_CPU_ExitCritical(psrbk);
 }
@@ -195,10 +205,14 @@ void CK_INTC_EnFastIrq(IN CK_UINT32 irq_num) {
 	CK_CPU_EnterCritical(&psrbk);
 	if (irq_num > 31) {
 		icrp->FIERH |= (1 << (irq_num - 32));
-        printf("JJJ_DEBUG CK_INTC_EnFastIrq FIERH = 0x%x\n", icrp->FIERH);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_EnFastIrq FIERH = 0x%x\n", icrp->FIERH);
+        #endif
 	} else {
 		icrp->FIERL |= (1 << irq_num);
-        printf("JJJ_DEBUG CK_INTC_EnFastIrq FIERL = 0x%x\n", icrp->FIERH);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_EnFastIrq FIERL = 0x%x\n", icrp->FIERH);
+        #endif
 	}
 	CK_CPU_ExitCritical(psrbk);
 }
@@ -215,10 +229,14 @@ void CK_INTC_DisFastIrq(IN CK_UINT32 irq_num) {
 	CK_CPU_EnterCritical(&psrbk);
 	if (irq_num > 31) {
 		icrp->FIERH &= ~(1 << (irq_num - 32));
-        printf("JJJ_DEBUG CK_INTC_DisFastIrq FIERH = 0x%x\n", icrp->FIERH);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_DisFastIrq FIERH = 0x%x\n", icrp->FIERH);
+        #endif
 	} else {
 		icrp->FIERL &= ~(1 << irq_num);
-        printf("JJJ_DEBUG CK_INTC_DisFastIrq FIERH = 0x%x\n", icrp->FIERH);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_DisFastIrq FIERH = 0x%x\n", icrp->FIERH);
+        #endif
 	}
 	CK_CPU_ExitCritical(psrbk);
 }
@@ -242,7 +260,9 @@ void CK_INTC_MaskNormalIrq(IN CK_UINT32 primask)
    */
   if((temp_icr &= 0x10000000) == 0x10000000)
   {
-      printf("JJJ_DEBUG CK_INTC_MaskNormalIrq 0x00\n");
+      #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_MaskNormalIrq 0x00\n");
+      #endif
     return;
   }
 
@@ -253,7 +273,9 @@ void CK_INTC_MaskNormalIrq(IN CK_UINT32 primask)
     icrp->ICR_ISR |= ((primask & 0x0000001f) << 16);
     icrp->ICR_ISR |= ICR_ME;
     CK_CPU_ExitCritical(psrbk);
-    printf("JJJ_DEBUG CK_INTC_MaskNormalIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_MaskNormalIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+    #endif
   }
 }
 
@@ -272,7 +294,9 @@ void CK_INTC_UnMaskNormalIrq(IN CK_UINT32 primask)
     icrp->ICR_ISR |= ((primask & 0x0000001f) << 16);
     icrp->ICR_ISR &= ~ICR_ME;
     CK_CPU_ExitCritical(psrbk);
-    printf("JJJ_DEBUG CK_INTC_UnMaskNormalIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_UnMaskNormalIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+    #endif
 }
 
 /************************************************************************
@@ -292,7 +316,9 @@ void CK_INTC_MaskFastIrq(IN CK_UINT32 primask)
   icrp->ICR_ISR |= ICR_MFI;
   icrp->ICR_ISR |= ICR_ME;
   CK_CPU_ExitCritical(psrbk);
-  printf("JJJ_DEBUG CK_INTC_MaskFastIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+  #if CK_INTC_DEBUG
+    printf("JJJ_DEBUG CK_INTC_MaskFastIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+  #endif
 }
 
 /**********************************************************************
@@ -311,7 +337,9 @@ void CK_INTC_UnMaskFastIrq(IN CK_UINT32 primask)
     icrp->ICR_ISR &= ~ICR_ME;
     icrp->ICR_ISR &= ~ICR_MFI;
     CK_CPU_ExitCritical(psrbk);
-    printf("JJJ_DEBUG CK_INTC_UnMaskFastIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_UnMaskFastIrq ICR_ISR = 0x%x\n", icrp->ICR_ISR);
+    #endif
 }
 
 /**********************************************************************
@@ -341,16 +369,22 @@ CK_INT32 CK_INTC_RequestIrq(PCKStruct_IRQHandler pirqhandler, IN CK_UINT32 mode)
     return FAILURE;
   }
   
-  printf("JJJ_DEBUG CK_INTC_RequestIrq irqid=0x%x\n", pirqhandler->irqid);
+  #if CK_INTC_DEBUG
+    printf("JJJ_DEBUG CK_INTC_RequestIrq mode 0x%x\n", mode);
+    printf("JJJ_DEBUG CK_INTC_RequestIrq irqid=0x%x\n", pirqhandler->irqid);
+  #endif
+  
   /* Assigns pirqhandler->priority to corresponding interrupt source */
   pr_index = (pirqhandler->irqid) / 4;
   shift = (3-(pirqhandler->irqid) % 4) * 8;
   CK_CPU_EnterCritical(&psrbk);
   icrp->PR[pr_index] &= ~(0x000000ff << shift);
   icrp->PR[pr_index] |= ((pirqhandler->priority) << shift);
-    printf("JJJ_DEBUG CK_INTC_RequestIrq pr_index=%d\n", pr_index);
-    printf("JJJ_DEBUG CK_INTC_RequestIrq shift=0x%x\n", shift);
-    printf("JJJ_DEBUG CK_INTC_RequestIrq icrp->PR[%d]=0x%x\n", pr_index, icrp->PR[pr_index]);
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_RequestIrq pr_index=%d\n", pr_index);
+        printf("JJJ_DEBUG CK_INTC_RequestIrq shift=0x%x\n", shift);
+        printf("JJJ_DEBUG CK_INTC_RequestIrq icrp->PR[%d]=0x%x\n", pr_index, icrp->PR[pr_index]);
+    #endif
     
     switch(mode) {
     case AUTO_MODE:
@@ -381,32 +415,39 @@ CK_INT32 CK_INTC_RequestIrq(PCKStruct_IRQHandler pirqhandler, IN CK_UINT32 mode)
             /* If the list of this priority is empty */
             if (NULL == (fast_irq_list[pirqhandler->priority]))
             {
-                //printf("JJJ_DEBUG CK_INTC_RequestIrq 0x02 priority=%d", pirqhandler->priority);
-            fast_irq_list[pirqhandler->priority] = pirqhandler;
-            fast_irq_list[pirqhandler->priority]->next = NULL;
-            CK_INTC_EnFastIrq(pirqhandler->priority);
+                fast_irq_list[pirqhandler->priority] = pirqhandler;
+                fast_irq_list[pirqhandler->priority]->next = NULL;
+                CK_INTC_EnFastIrq(pirqhandler->priority);
             }
             /* If the list of this priority is not empty */
             else
             {
-                //printf("JJJ_DEBUG CK_INTC_RequestIrq 0x03 priority=%d", pirqhandler->priority);
-            pirqhandler->next = fast_irq_list[pirqhandler->priority];
-            fast_irq_list[pirqhandler->priority] = pirqhandler;
+                pirqhandler->next = fast_irq_list[pirqhandler->priority];
+                fast_irq_list[pirqhandler->priority] = pirqhandler;
             }
         }
         break;
     case VECTOR_SHARE_MODE:
-        ckcpu_vsr_table[CKCORE_VECTOR_SYS + pirqhandler->priority]
-                    =(CK_UINT32) pirqhandler->handler;
-        printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_SHARE_MODE priority=%d\n", pirqhandler->priority);
+
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_SHARE_MODE priority=%d\n", pirqhandler->priority);
+        #endif
         /* If is normal interrupt */
         if (!(pirqhandler->bfast)) {
-            printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_SHARE_MODE normal\n");
+            #if CK_INTC_DEBUG
+                printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_SHARE_MODE normal\n");
+            #endif
+            ckcpu_vsr_table[CKCORE_VECTOR_SYS + pirqhandler->priority]
+                            = (CK_UINT32) hw_vsr_vec;
             CK_INTC_EnNormalIrq( pirqhandler->priority );
         }
         /* If is fast interrupt */
         else {
-            printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_SHARE_MODE fast\n");
+            #if CK_INTC_DEBUG
+                printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_SHARE_MODE fast\n");
+            #endif
+            ckcpu_vsr_table[CKCORE_VECTOR_SYS + pirqhandler->priority]
+                            = (CK_UINT32) hw_vsr_fastvec;
             CK_INTC_EnFastIrq( pirqhandler->priority );
         }
         break;
@@ -414,19 +455,22 @@ CK_INT32 CK_INTC_RequestIrq(PCKStruct_IRQHandler pirqhandler, IN CK_UINT32 mode)
         /* If is normal interrupt */
         if (!(pirqhandler->bfast)) 
         {
-            printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_UNIQUE_MODE normal\n");
+            #if CK_INTC_DEBUG
+                printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_UNIQUE_MODE normal\n");
+            #endif
             ckcpu_vsr_table[CKCORE_VECTOR_SYS + pirqhandler->priority]
-                    =(CK_UINT32) pirqhandler->handler;
+                    =(CK_UINT32) hw_vsr_vec;
             CK_INTC_EnNormalIrq( pirqhandler->priority );
         } 
         /* If is fast interrupt */
         else 
         {
-            printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_UNIQUE_MODE fast\n");
+            #if CK_INTC_DEBUG
+                printf("JJJ_DEBUG CK_INTC_RequestIrq VECTOR_UNIQUE_MODE fast\n");
+            #endif
             ckcpu_vsr_table[CKCORE_VECTOR_FASTVEC + pirqhandler->priority]
-                    =(CK_UINT32) pirqhandler->handler;
+                    =(CK_UINT32) hw_vsr_fastvec;
             CK_INTC_EnFastIrq( pirqhandler->priority );
-            
         }
         break;
     default:
@@ -455,20 +499,26 @@ CK_INT32 CK_INTC_FreeIrq(INOUT PCKStruct_IRQHandler pirqhandler, IN CK_UINT32 mo
     PCKStruct_IRQHandler  ptemp;
     PCKStruct_IRQHandler  pre_node = NULL;
     
-    printf("JJJ_DEBUG CK_INTC_FreeIrq irqid=0x%x, priority=0x%x\n", pirqhandler->irqid, pirqhandler->priority);
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_FreeIrq irqid=0x%x, priority=0x%x\n", pirqhandler->irqid, pirqhandler->priority);
+    #endif
 
-    if (pirqhandler == NULL)
-        printf("JJJ_DEBUG pirqhandler == NULL\n");
+    #if CK_INTC_DEBUG
+        if (pirqhandler == NULL)
+            printf("JJJ_DEBUG pirqhandler == NULL\n");
     
-    if (pirqhandler->handler == NULL)
-        printf("JJJ_DEBUG pirqhandler->handler == NULL\n");
+        if (pirqhandler->handler == NULL)
+            printf("JJJ_DEBUG pirqhandler->handler == NULL\n");
+    #endif
     
     /* Judge the validity of pirqhandler */
     if((pirqhandler == NULL) ||
         (pirqhandler->handler == NULL) ||
         ((pirqhandler->irqid < 0) || (pirqhandler->irqid > 63)))
     {
-        printf("JJJ_DEBUG CK_INTC_FreeIrq FAILURE\n");
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FreeIrq FAILURE\n");
+        #endif
         return FAILURE;
     }
     
@@ -548,31 +598,37 @@ CK_INT32 CK_INTC_FreeIrq(INOUT PCKStruct_IRQHandler pirqhandler, IN CK_UINT32 mo
         ptemp = NULL;
         break;
     case VECTOR_SHARE_MODE:
-        printf("JJJ_DEBUG CK_INTC_FreeIrq VECTOR_SHARE_MODE 0x00\n");
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FreeIrq VECTOR_SHARE_MODE 0x00\n");
+        #endif
         ckcpu_vsr_table[CKCORE_VECTOR_SYS + pirqhandler->priority]
-                    =(CK_UINT32) hw_vsr_default_exception;
-        printf("JJJ_DEBUG CK_INTC_FreeIrq VECTOR_SHARE_MODE 0x01\n");
+                    =(CK_UINT32) default_exception_handler;
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FreeIrq VECTOR_SHARE_MODE 0x01\n");
+        #endif
         /* If is normal interrupt */
         if (!(pirqhandler->bfast))
             CK_INTC_DisNormalIrq( pirqhandler->priority );
         /* If is fast interrupt */
         else
             CK_INTC_DisFastIrq( pirqhandler->priority );
-        printf("JJJ_DEBUG CK_INTC_FreeIrq VECTOR_SHARE_MODE 0x02\n");
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FreeIrq VECTOR_SHARE_MODE 0x02\n");
+        #endif
         break;
     case VECTOR_UNIQUE_MODE:
         /* If is normal interrupt */
         if (!(pirqhandler->bfast)) 
         {
             ckcpu_vsr_table[CKCORE_VECTOR_SYS + pirqhandler->priority]
-                    =(CK_UINT32) hw_vsr_default_exception;
+                    =(CK_UINT32) default_exception_handler;
             CK_INTC_DisNormalIrq( pirqhandler->priority );
         } 
         /* If is fast interrupt */
         else 
         {
             ckcpu_vsr_table[CKCORE_VECTOR_FASTVEC + pirqhandler->priority]
-                    =(CK_UINT32) hw_vsr_default_exception;
+                    =(CK_UINT32) default_exception_handler;
             CK_INTC_DisFastIrq( pirqhandler->priority );
         }
         break;
@@ -658,12 +714,16 @@ void CK_INTC_InterruptService (int offset)
     PCKStruct_IRQHandler phandler;
     
     phandler = normal_irq_list[offset];
-    //printf("JJJ_DEBUG CK_INTC_InterruptService offset = 0x%x", offset);
-    
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_InterruptService offset = 0x%x", offset);
+    #endif
+
     while( phandler != NULL)
     {
         CK_INTC_MaskNormalIrq(offset); //JJJ_DEBUG
-        printf("JJJ_DEBUG CK_INTC_InterruptService irqid = 0x%x", phandler->irqid);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_InterruptService irqid = 0x%x", phandler->irqid);
+        #endif
         /* phandler -> handler must not be NULL */
         phandler -> handler(phandler->irqid);
         phandler = phandler->next;
@@ -687,16 +747,67 @@ void CK_INTC_FastInterruptService (int offset)
     PCKStruct_IRQHandler phandler;
     
     phandler = fast_irq_list[offset];
-    //printf("JJJ_DEBUG CK_INTC_FastInterruptService offset = 0x%x\n", offset);
+    #if CK_INTC_DEBUG
+        printf("JJJ_DEBUG CK_INTC_FastInterruptService offset = 0x%x\n", offset);
+    #endif
     
     while( phandler != NULL)
     {
-        CK_INTC_MaskFastIrq(offset); //JJJ_DEBUG
-        printf("JJJ_DEBUG CK_INTC_FastInterruptService irqid = 0x%x\n", phandler->irqid);
+        CK_INTC_MaskFastIrq(offset);
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FastInterruptService irqid = 0x%x\n", phandler->irqid);
+        #endif
         /* phandler -> handler must not be NULL */
         phandler -> handler(phandler->irqid);
         phandler = phandler->next;
-        CK_INTC_UnMaskFastIrq(offset); //JJJ_DEBUG
+        CK_INTC_UnMaskFastIrq(offset);
+    }
+}
+
+/*********************************************************
+CK_INTC_NormalVectorISR -- Execute the normal vector interrupt service,
+INPUT: None
+
+RETURN VALUE: None
+
+*********************************************************/
+void CK_INTC_NormalVectorISR ()
+{
+    if (icrp->IFRL & 0x1) {
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_NormalVectorISR 0x00\n");
+        #endif
+        CK_Normal0_Vector_Handler();
+    }
+    
+    if ((icrp->IFRH >> 31) & 0x1) {
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_NormalVectorISR 0x01\n");
+        #endif
+        CK_Normal63_Vector_Handler();
+    }
+}
+
+/*********************************************************
+CK_INTC_FastVectorISR -- Execute the fast vector interrupt service,
+INPUT: None
+
+RETURN VALUE: None
+
+*********************************************************/
+void CK_INTC_FastVectorISR ()
+{
+    if (icrp->IFRL & 0x1) {
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FastVectorISR 0x00\n");
+        #endif
+        CK_Fast0_Vector_Handler();
+    }
+    if ((icrp->IFRH >> 31) & 0x1) {
+        #if CK_INTC_DEBUG
+            printf("JJJ_DEBUG CK_INTC_FastVectorISR 0x00\n");
+        #endif
+        CK_Fast63_Handler();
     }
 }
 

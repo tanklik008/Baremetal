@@ -42,7 +42,7 @@ typedef struct {
 } CKStruct_INTCTestInfo, * PCKStruct_INTCTestInfo;
 
 // VSR table
-extern  volatile unsigned int ckcpu_vsr_table[256] ALIGN_4;
+extern  volatile unsigned int ckcpu_vsr_table[256];
 /* Statement of those functions which are used in intc.c*/
 void CK_CPU_EnAllNormalIrq(void);
 void CK_CPU_DisAllNormalIrq(void);

@@ -13,7 +13,8 @@
 .global hw_vsr_autovec
 .global hw_vsr_fastautovec
 .global hw_vsr_tlbmiss
-
+.global hw_vsr_vec
+.global hw_vsr_fastvec
 
 .extern CK_Default_Exception_Handler   
 .extern CK_INTC_InterruptService 
@@ -152,7 +153,7 @@ hw_vsr_default_exception:
 	rte
 
 /*
- * Normal interrupt vector handler
+ * Normal interrupt auto vector handler
  */
 	.text
 	.balign 4
@@ -201,7 +202,7 @@ hw_vsr_autovec:
 	rte
 
 /*
- * Fast interrupt vector handler.
+ * Fast interrupt auto vector handler.
  */
 	.text
 	.balign 4
@@ -237,3 +238,78 @@ hw_vsr_fastautovec:
     
 	rfi		      /*   Restore the psr and pc     */
 
+/*
+ * Normal interrupt vector handler
+ */
+	.text
+	.balign 4
+hw_vsr_vec:
+	/* save context */
+	subi    sp, 28             /* Allocate space for all registers */
+	stw     a0, (sp, 0)
+	stw     a1, (sp, 4)
+	stw     a2, (sp, 8)
+	stw     a3, (sp, 12)
+	stw     t0, (sp, 16)
+	stw     t1, (sp, 20)
+	/* local registers need not be saved */
+	stw     lr, (sp, 24)
+
+	subi    sp, 8
+	mfcr    a3, epsr
+	stw     a3, (sp, 4)	/* save epsr registwr */
+	mfcr    a2, epc
+	stw     a2, (sp, 0)	/* save epc register */
+
+	bsr     CK_INTC_NormalVectorISR
+
+	ldw     a3, (sp, 0)
+	mtcr    a3, epc		/* restore the epc */
+	ldw     a2, (sp, 4)
+	mtcr    a2, epsr	/* restore the epsr */
+	addi    sp, 8
+
+	/* restore all the regs */
+	ldw     a0, (sp, 0)
+	ldw     a1, (sp, 4)
+	ldw     a2, (sp, 8)
+	ldw     a3, (sp, 12)
+	ldw     t0, (sp, 16)
+	ldw     t1, (sp, 20)
+	/* local registers need not be saved */
+	ldw     lr, (sp, 24)
+	addi    sp, 28
+
+	rte
+
+/*
+ * Fast interrupt vector handler.
+ */
+	.text
+	.balign 4
+hw_vsr_fastvec:
+    /* save context */
+	subi    sp, 28             /* Allocate space for all registers */
+	stw     a0, (sp, 0)
+	stw     a1, (sp, 4)
+	stw     a2, (sp, 8)
+	stw     a3, (sp, 12)
+	stw     t0, (sp, 16)
+	stw     t1, (sp, 20)
+	/* local registers need not be saved */
+	stw     lr, (sp, 24)
+    
+	bsr     CK_INTC_FastVectorISR
+    
+    /* restore all the regs */
+	ldw     a0, (sp, 0)
+	ldw     a1, (sp, 4)
+	ldw     a2, (sp, 8)
+	ldw     a3, (sp, 12)
+	ldw     t0, (sp, 16)
+	ldw     t1, (sp, 20)
+	/* local registers need not be saved */
+	ldw     lr, (sp, 24)
+	addi    sp, 28
+    
+	rfi		      /*   Restore the psr and pc     */

@@ -94,10 +94,14 @@
 
 /**** APB ****/
 /***** Intc ******/
+#define CK_INTC_TEST        1
+#define CK_INTC_DEBUG       0
 #if CONFIG_QEMU
 #define CK_INTC_BASEADDRESS			(0x10010000+PERI_BASE)
 #else
+// For deepeye1000_DDR3_rdy_bp2_0118.bit
 //#define CK_INTC_BASEADDRESS			(0xFC20D000+PERI_BASE)
+// For fpga_top_deepeye1000_0201.bit
 #define CK_INTC_BASEADDRESS			(0xFC600000+PERI_BASE)
 #endif
 
@@ -151,6 +155,7 @@
 
 
 /**** Timer ****/
+#define  CK_TIMER_TEST          0
 #define  CK_TIMER0_BASSADDR			(volatile CK_UINT32 *)(0xFC200000+PERI_BASE)
 #define  CK_TIMER1_BASSADDR			(volatile CK_UINT32 *)(0xFC201000+PERI_BASE)
 #define  CK_TIMER2_BASSADDR			(volatile CK_UINT32 *)(0xFC202000+PERI_BASE)

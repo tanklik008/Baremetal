@@ -28,7 +28,6 @@ static void CK_Console_CallBack(CK_INT8 error)
   {
     CK_UART_ClearRxBuffer(consoleuart);
   }
-  
 } 
 
 static void CK_Console_Init()
@@ -42,8 +41,6 @@ static void CK_Console_Init()
 static void CK_Drivers_Init(void)
 {
 	CK_Uart_DriverInit();
-    //CK_Console_Init(); //JJJ_DEBUG
-	CK_Timer_Init();
 #ifndef CONFIG_INTC_DIS  
     CK_INTC_Init(AUTO_MODE);
 #endif
@@ -69,8 +66,15 @@ int main ( void )
 		/*
 	     * Call the interrupt controller test case.
          */
-        CK_Timer_Test();
-        //CK_INTC_Test();
+        #if CK_TIMER_TEST
+            CK_Timer_Init();
+            CK_Timer_Test();
+        #endif
+        
+        #if CK_INTC_TEST
+            // Test will reconfigure the INTC, so it should be the last test
+            CK_INTC_Test();
+        #endif
     } 
 
     return 0x00;
