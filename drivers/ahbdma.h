@@ -11,7 +11,7 @@
 #define AHB_DMAC_MAX_CHANNELS 5
 
 //JJJ_DEBUG #define DMAC_BASE_ADDRESS     DMAC_BASE
-#define DMAC_BASE_ADDRESS       PCK_AXI_DMA_Control
+#define DMAC_BASE_ADDRESS       CK_AHB_DMA_CONTROL
 
 /*
  * whether to dump the register information on stdout
