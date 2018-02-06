@@ -71,6 +71,10 @@ int main ( void )
             CK_Timer_Test();
         #endif
         
+        #if CK_AHB_DMA_TEST
+            CK_AHBDMA_Test();
+        #endif
+        
         #if CK_INTC_TEST
             // Test will reconfigure the INTC, so it should be the last test
             CK_INTC_Test();

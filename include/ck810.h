@@ -74,7 +74,9 @@
 #define CK_POWM_ADDRBASE			(volatile CK_UINT32 *)(0x10002000+PERI_BASE)
 
 /** Define DMA control base address **/
-#define CK_AHB_DMA_CONTROL      	(volatile CK_UINT32 *)(0xFC100000+PERI_BASE)
+#define CK_AHB_DMA_TEST             1
+//JJJ_DEBUG#define CK_AHB_DMA_CONTROL      	(volatile CK_UINT32 *)(0xFC100000+PERI_BASE)
+#define CK_AHB_DMA_CONTROL      	0xFC100000 + PERI_BASE
 
 /****** USBD  *************/
 #define CK_USBD_ADDRBASE			(volatile CK_UINT32 *)(0x10005000+PERI_BASE)
@@ -94,8 +96,8 @@
 
 /**** APB ****/
 /***** Intc ******/
-#define CK_INTC_TEST        1
-#define CK_INTC_DEBUG       0
+#define CK_INTC_TEST                0
+#define CK_INTC_DEBUG               0
 #if CONFIG_QEMU
 #define CK_INTC_BASEADDRESS			(0x10010000+PERI_BASE)
 #else
@@ -178,6 +180,9 @@
 #define CK_UART_ADDRBASE0			(volatile CK_UINT32 *)(0xFC400000+PERI_BASE)
 #define CK_UART_ADDRBASE1			(volatile CK_UINT32 *)(0xFC401000+PERI_BASE)
 #define CK_UART_ADDRBASE2			(volatile CK_UINT32 *)(0xFC402000+PERI_BASE)
+#define CK_UART_ADDR0			    (volatile CK_UINT32 *)(0xFC400000+PERI_BASE)
+#define CK_UART_ADDR1			    (volatile CK_UINT32 *)(0xFC401000+PERI_BASE)
+#define CK_UART_ADDR2			    (volatile CK_UINT32 *)(0xFC402000+PERI_BASE)
 #endif
 
 /***** PINMUX *****/

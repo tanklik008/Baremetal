@@ -12,6 +12,7 @@
 //#include "iis.h"
 //#include "w25n01.h"
 
+#define UART_THR CK_UART_ADDR0 + 0x00
 //********************************************************************
 //  Punsigned charlic data
 //********************************************************************
@@ -42,8 +43,7 @@ void DMAC_Init (void)
 
 
 
-#ifdef	AHB_DMAC_INTR_ENABLE	
-	
+#ifdef	AHB_DMAC_INTR_ENABLE
     Intc_EnableIntSr(DMA_INTR_NUM);
 	DMAC_INT_Flag=0;
 	DMAC_Interrupt_en (DMAC_INTERRUPT_BLOCK);
@@ -208,9 +208,6 @@ unsigned int DMAC_CheckDone (unsigned int channel_number)
 	
 }
 
-
-
-
 //****************************************************************
 //DMAC close
 //****************************************************************
@@ -272,8 +269,6 @@ void dmac_isr_handler (void)
 
 }
 
-
-
 void DMAMem2MemOpen(unsigned char channel,unsigned int src_addr,unsigned int des_addr,unsigned int count,unsigned char dma_intr,unsigned char UNIT)
 {
 
@@ -320,26 +315,11 @@ void DMAMem2PeripheralOpen(CK_UINT8 channel, CK_UINT32 src_addr, CK_UINT32 count
 		dma_intr=0;
 	#endif
     
-    /* JJJ_DEBUG>>
-	switch(peripheral_ID)
-	{
-
-		case peripheral_uart0_rx:
-			channel_info.sarx =  (CK_UINT32)src_addr;		
-			channel_info.darx =  (CK_UINT32)NAND_AHB_FiFo;		
-			channel_info.ctlHx = count;			
-			channel_info.ctlLx = DMAC_CTL_M2M_DW | DMAC_CTL_SRC_MSIZE16 | 
-								 DMAC_CTL_DEST_MSIZE256 | DMAC_CTL_SINC_INC | 
-								 DMAC_CTL_DINC_NO | DMAC_CTL_SRC_TR_WIDTH32 | 
-								 DMAC_CTL_DST_TR_WIDTH32 | dma_intr;		
-			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_SOFTWARE|DMAC_CFG_HS_DST_HARDWARE;		
-			channel_info.cfgHx = DMAC_CFG_DEST_PER(peripheral_uart0_rx)|DMAC_CFG_SRC_PER(0)|DMAC_CFG_FCMODE_1|DMAC_CFG_FIFO_MODE_0|DMAC_CFG_PROTCTL(1);
-			break;
-			
+    switch(peripheral_ID)
+	{		
 		case peripheral_uart0_tx:
-			channel_info.sarx =  (CK_UINT32)src_addr;		
-			//JJJ_DEBUG channel_info.darx =  (CK_UINT32)UART_TDR;
-            channel_info.darx =  CK_UART_ADDRBASE0;
+			channel_info.sarx =  (U32)src_addr;		
+			channel_info.darx =  (U32)UART_THR;
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE1 | 
 								 DMAC_CTL_DEST_MSIZE1 | DMAC_CTL_SINC_INC | 
@@ -349,47 +329,18 @@ void DMAMem2PeripheralOpen(CK_UINT8 channel, CK_UINT32 src_addr, CK_UINT32 count
 			channel_info.cfgHx = DMAC_CFG_DEST_PER(peripheral_uart0_tx);
 			break;
 			
-		case peripheral_spi_m2_tx:
-			
-			channel_info.sarx =  (CK_UINT32)src_addr;		
-			channel_info.darx =  (CK_UINT32)SPI_TXREG;		
+		case peripheral_spi_master_tx:
+			channel_info.sarx =  (U32)src_addr;		
+			//JJJ_DEBUGchannel_info.darx =  (U32)SPI_TXREG;	//JJJ_DEBUG
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE4 | 
 								 DMAC_CTL_DEST_MSIZE4 | DMAC_CTL_SINC_INC | 
 								 DMAC_CTL_DINC_NO | DMAC_CTL_SRC_TR_WIDTH8 | 
 								 DMAC_CTL_DST_TR_WIDTH8 | dma_intr;		
 			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_SOFTWARE|DMAC_CFG_HS_DST_HARDWARE;		
-			channel_info.cfgHx = DMAC_CFG_DEST_PER(peripheral_spi_m2_tx);
+			channel_info.cfgHx = DMAC_CFG_DEST_PER(peripheral_spi_master_tx);
 			break;
-		case peripheral_spi_nfc_tx:			
-			channel_info.sarx =  (CK_UINT32)src_addr;		
-			channel_info.darx =  (CK_UINT32)SPI_TXREG_NFC;		
-			channel_info.ctlHx = count;			
-			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE4 | 
-								 DMAC_CTL_DEST_MSIZE4 | DMAC_CTL_SINC_INC | 
-								 DMAC_CTL_DINC_NO | DMAC_CTL_SRC_TR_WIDTH8 | 
-								 DMAC_CTL_DST_TR_WIDTH8 | dma_intr;		
-			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_SOFTWARE|DMAC_CFG_HS_DST_HARDWARE;		
-			channel_info.cfgHx = DMAC_CFG_DEST_PER(peripheral_spi_nfc_tx - peripheral_value);	
-			break;
-			
-		case peripheral_i2s0_tx:
-			
-			channel_info.sarx =  (CK_UINT32)src_addr;		
-			channel_info.darx =  (CK_UINT32)REG_QI2S_WR(0);		
-			channel_info.ctlHx = count;			
-			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE4 | 
-								 DMAC_CTL_DEST_MSIZE4 | DMAC_CTL_SINC_INC | 
-								 DMAC_CTL_DINC_NO | DMAC_CTL_SRC_TR_WIDTH8 | 
-								 DMAC_CTL_DST_TR_WIDTH8 | dma_intr;		
-			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_SOFTWARE|DMAC_CFG_HS_DST_HARDWARE;		
-			channel_info.cfgHx = DMAC_CFG_DEST_PER(peripheral_i2s0_tx - peripheral_value);
-			break;	
-	   		
-
-
 	}
-    <<JJJ_DEBUG */
 	channel_info.sgrx = 0x0;
 	channel_info.dsrx = 0x0;
 	channel_info.llpx = 0x0;
@@ -410,27 +361,11 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 	#else
 		dma_intr=0;
 	#endif
-    
-    /* JJJ_DEBUG>>
-	switch(peripheral_ID)
-	{
-		
-	    case peripheral_uart0_rx :
-		    channel_info.sarx =  (CK_UINT32)NAND_AHB_FiFo;		
-			channel_info.darx =  (CK_UINT32)des_addr;		
-			channel_info.ctlHx =  count;								
-			channel_info.ctlLx = DMAC_CTL_M2M_DW | DMAC_CTL_SRC_MSIZE256 | 
-								 DMAC_CTL_DEST_MSIZE16 | DMAC_CTL_SINC_NO | 
-								 DMAC_CTL_DINC_INC | DMAC_CTL_SRC_TR_WIDTH32 | 
-								 DMAC_CTL_DST_TR_WIDTH32 | dma_intr;
-								 		
-			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_HARDWARE|DMAC_CFG_HS_DST_SOFTWARE;		
-			channel_info.cfgHx = DMAC_CFG_SRC_PER(peripheral_uart0_rx)|DMAC_CFG_FCMODE_1|DMAC_CFG_FIFO_MODE_0|DMAC_CFG_PROTCTL(1);
 
-			break;
-		
+	switch(peripheral_ID)
+	{	
 		 case peripheral_uart0_rx:
-			channel_info.sarx =  (CK_UINT32)UART_RDR;		
+			channel_info.sarx =  (CK_UINT32)UART_THR;
 			channel_info.darx =  (CK_UINT32)des_addr;		
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_P2M_DW | DMAC_CTL_SRC_MSIZE4 | 
@@ -442,8 +377,8 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 	
 		    break;
 	
-		case peripheral_spi_master_tx :
-			channel_info.sarx =  (CK_UINT32)SPI_RXREG;		
+		case peripheral_spi_master_rx :
+			//JJJ_DEBUGchannel_info.sarx =  (CK_UINT32)SPI_RXREG;		
 			channel_info.darx =  (CK_UINT32)des_addr;		
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_P2M_DW | DMAC_CTL_SRC_MSIZE4 | 
@@ -451,33 +386,9 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 								 DMAC_CTL_DINC_INC | DMAC_CTL_SRC_TR_WIDTH8 | 
 								 DMAC_CTL_DST_TR_WIDTH8 | dma_intr;		
 			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_HARDWARE|DMAC_CFG_HS_DST_SOFTWARE;		
-			channel_info.cfgHx = DMAC_CFG_SRC_PER(peripheral_spi_master_tx);
+			channel_info.cfgHx = DMAC_CFG_SRC_PER(peripheral_spi_master_rx);
 			break;
-		case peripheral_spi_nfc_rx:
-			channel_info.sarx =  (CK_UINT32)SPI_RXREG_NFC;		
-			channel_info.darx =  (CK_UINT32)des_addr;		
-			channel_info.ctlHx = count;			
-			channel_info.ctlLx = DMAC_CTL_P2M_DW | DMAC_CTL_SRC_MSIZE4 | 
-								 DMAC_CTL_DEST_MSIZE4 | DMAC_CTL_SINC_NO | 
-								 DMAC_CTL_DINC_INC | DMAC_CTL_SRC_TR_WIDTH8 | 
-								 DMAC_CTL_DST_TR_WIDTH8 | dma_intr;		
-			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_HARDWARE|DMAC_CFG_HS_DST_SOFTWARE;		
-			channel_info.cfgHx = DMAC_CFG_SRC_PER(peripheral_spi_nfc_rx - peripheral_value);
-			break;
-		case peripheral_i2s0_rx :
-			channel_info.sarx =  (CK_UINT32)REG_QI2S_RD(0);		
-			channel_info.darx =  (CK_UINT32)des_addr;		
-			channel_info.ctlHx = count;			
-			channel_info.ctlLx = DMAC_CTL_P2M_DW | DMAC_CTL_SRC_MSIZE4 | 
-								 DMAC_CTL_DEST_MSIZE4 | DMAC_CTL_SINC_NO | 
-								 DMAC_CTL_DINC_INC | DMAC_CTL_SRC_TR_WIDTH8 | 
-								 DMAC_CTL_DST_TR_WIDTH8 | dma_intr;		
-			channel_info.cfgLx = DMAC_CFG_CH_PRIOR(0)|DMAC_CFG_HS_SRC_HARDWARE|DMAC_CFG_HS_DST_SOFTWARE;		
-			channel_info.cfgHx = DMAC_CFG_SRC_PER(peripheral_i2s0_rx - peripheral_value);
-			break;	
-
 	}
-    <<JJJ_DEBUG */
     
 	channel_info.sgrx = 0x0;
 	channel_info.dsrx = 0x0;
@@ -486,87 +397,154 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 } 
 
 
-#define MEM_TEST_L	0x1000  //0x2000//8K
+#define MEM_TEST_L	        0x1000  //0x2000//8K
+#define MEM_TEST_SRC        0x20000000
+#define MEM_TEST_DEST       0x20004000
 
-void CK_AHBDMA_Test()
+
+/*JJJ_DEBUG>>
+void CK_AHBDMA_MEM2UART_Test(void)
 {
-		unsigned int data_flag,val,loop,SRC,DEST,BurstL,TRWidth;
-		unsigned int *pSource,*pDest;
-		pSource = (unsigned int *)0xF0008000;//0xF0000000 ;
-		pDest = (unsigned int *)0xF000C000;//0xF0008000;
-      
-		printf("\nSynopsys AHB DMA Controller Test. . . \n");
+    u32 i;
+    UART_INFO uartinfo_default= {BR115200,DATAWIDTH_8,STOP_ONE,PARITY_NO,0,1};
+	unsigned char T[] = {
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
+	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n'
+	};
+	for (i=0;i<0x30*6;i++)
+	{
+	 write_mreg8(0xF0008000+i,T[i]);
+	}
+    DMAC_Init();
+    DMAMem2PeripheralOpen(CHANNEL_WR, 0xF0008000, 0x30*6, peripheral_uart1_tx,  1, 0);
+    DMAC_Start(CHANNEL_WR); 
+    Uart_SetParameter(&uartinfo_default);
+    while(!(DMAC_CheckDone(CHANNEL_WR)));
+    DMAC_Close(CHANNEL_WR); 
+}
 
-		for(TRWidth = 1;TRWidth<5;(TRWidth*=2))
+void CK_AHBDMA_UART2MEM_Test(void)
+{
+    UART_INFO uartinfo_default= {BR115200,DATAWIDTH_8,STOP_ONE,PARITY_NO,0,1}; 
+	DMAC_Init();
+    DMAPeripheral2MemOpen(CHANNEL_RD, 0xF0006000, 0x30*6, peripheral_uart1_rx,  1, 0);
+    DMAC_Start(CHANNEL_RD); 
+    Uart_SetParameter(&uartinfo_default);
+    while(!(DMAC_CheckDone(CHANNEL_RD)));
+    DMAC_Close(CHANNEL_RD); 
+}
+
+void CK_AHBDMA_UART_Test(void)
+{
+	CK_AHBDMA_MEM2UART_Test();
+	CK_AHBDMA_UART2MEM_Test();
+}
+<<JJJ_DEBUG*/
+
+void CK_AHBDMA_MEM2MEM_Test() {
+    unsigned int data_flag,val,loop,SRC,DEST,BurstL,TRWidth;
+	unsigned int *pSource,*pDest;
+	pSource = (unsigned int *)MEM_TEST_SRC;
+	pDest = (unsigned int *)MEM_TEST_DEST;
+    
+	printf("\nSynopsys AHB DMA Controller Test. . . \n");
+
+	for(TRWidth = 1;TRWidth<5;(TRWidth*=2))
+	{
+		for(loop = 0;loop < (MEM_TEST_L/2);loop++)//clear 2*Mem_test_l memory
 		{
-			for(loop = 0;loop < (MEM_TEST_L/2);loop++)//clear 2*Mem_test_l memory
-			{
-				*pSource = 0;
-				pSource ++ ;
-			}
-			pSource = (unsigned int *)0xF0008000;//0xF0000000 ;//prepare data
-			for(loop = 0;loop < (MEM_TEST_L/4);loop++)
-			{
-				*pSource = (CK_UINT32)pSource ;//rand();
-				*pDest  =  0 ;
-				pSource ++ ;
-				pDest ++;
-			}		
-			pSource = (unsigned int *)0xF0007000;//0xF0000000 ;
-			BurstL = 63 ;//DMAC_BLK_SIZE_256 ;  //DMAC_BLK_SIZE_256;
+			*pSource = 0;
+			pSource ++ ;
+		}
+		pSource = (unsigned int *)MEM_TEST_SRC;
+		for(loop = 0;loop < (MEM_TEST_L/4);loop++)
+		{
+			*pSource = (CK_UINT32)pSource ;//rand();
+			*pDest  =  0 ;
+			pSource ++ ;
+			pDest ++;
+		}		
+		pSource = (unsigned int *)(MEM_TEST_DEST - 0x1000);
+		BurstL = 63 ;//DMAC_BLK_SIZE_256 ;  //DMAC_BLK_SIZE_256;
 
-			val = MEM_TEST_L;//Bytes
-			SRC = 0xF0008000;//0xF0000000 ;
-			DEST = 0xF000C000;//0xF0008000 ;
-			DMAC_Init();
-			TRWidth  =  4 ;
-			while(1)
-			{
-					if(val > (BurstL*TRWidth))
-					{
-					        printf("  Dma_APP  val > (BurstL*TRWidth) [[ 0x%x  >  0x%x * 0x%x  ]]  \r\n",val,BurstL,TRWidth);
-							DMAMem2MemOpen(0,SRC,DEST,BurstL,0,TRWidth);
-							DMAC_Start(0);
-
-							printf ("read_mreg32 (DMAC_DMA_COMP_PARAM_1) =0x%x  \r\n  ",read_mreg32 (DMAC_DMA_COMP_PARAM_1));
-							while(!(DMAC_CheckDone(0)));
-							val -= (BurstL*TRWidth);
-							SRC += (BurstL*TRWidth);
-							DEST += (BurstL*TRWidth);
-					}
-					else
-					{
-					        printf("  Dma_APP  val <= (BurstL*TRWidth)   \r\n");
-							DMAMem2MemOpen(0,SRC,DEST,(val/TRWidth),0,TRWidth);
-							DMAC_Start(0);
-							val = 0;
-							break;
-					}
-			}
-			while(!(DMAC_CheckDone(0)));
-			DMAC_Close(0);
-			pSource = (unsigned int *)0xF0008000;//0xF0000000 ;
-			pDest = (unsigned int *)0xF000C000;//0xF0008000 ;
-			data_flag = 0;
-			for(loop = 0;loop < (MEM_TEST_L/4);loop++)
-			{
-				if(*pSource == (*pDest))
+		val = MEM_TEST_L;//Bytes
+		SRC = MEM_TEST_SRC;
+		DEST = MEM_TEST_DEST;
+		DMAC_Init();
+		TRWidth  =  4 ;
+		while(1)
+		{
+				if(val > (BurstL*TRWidth))
 				{
-					
+				        printf("  Dma_APP  val > (BurstL*TRWidth) [[ 0x%x  >  0x%x * 0x%x  ]]  \r\n",val,BurstL,TRWidth);
+						DMAMem2MemOpen(0,SRC,DEST,BurstL,0,TRWidth);
+						DMAC_Start(0);
+
+						printf ("read_mreg32 (DMAC_DMA_COMP_PARAM_1) =0x%x  \r\n  ",read_mreg32 (DMAC_DMA_COMP_PARAM_1));
+						while(!(DMAC_CheckDone(0)));
+						val -= (BurstL*TRWidth);
+						SRC += (BurstL*TRWidth);
+						DEST += (BurstL*TRWidth);
 				}
 				else
 				{
-					printf("\r\nerror at:0x%lx%\r\n",loop);
-					data_flag ++;
-					return ;
+				        printf("  Dma_APP  val <= (BurstL*TRWidth)   \r\n");
+						DMAMem2MemOpen(0,SRC,DEST,(val/TRWidth),0,TRWidth);
+						DMAC_Start(0);
+						val = 0;
+						break;
 				}
-				pSource++;
-				pDest++;
+		}
+		while(!(DMAC_CheckDone(0)));
+		DMAC_Close(0);
+		pSource = (unsigned int *)MEM_TEST_SRC;
+		pDest = (unsigned int *)MEM_TEST_DEST;
+		data_flag = 0;
+		for(loop = 0;loop < (MEM_TEST_L/4);loop++)
+		{
+			if(*pSource == (*pDest))
+			{
+				
 			}
-			printf("width:%ld£¬data correct rate:%%%ld!\r\n",TRWidth,((100-(data_flag*100)/MEM_TEST_L)));
-		   }
-		   printf("FINISH  Dma_APP  \r\n");
-		
+			else
+			{
+				printf("\r\nerror at:0x%lx%\r\n",loop);
+				data_flag ++;
+				return ;
+			}
+			pSource++;
+			pDest++;
+		}
+		printf("width:%ld£¬data correct rate:%%%ld!\r\n",TRWidth,((100-(data_flag*100)/MEM_TEST_L)));
+	   }
+	   printf("FINISH  Dma_APP  \r\n");
+}
+
+void CK_AHBDMA_Test()
+{
+    printf("\nSynopsys AHB DMA Controller Test. . . \n");
+	CK_AHBDMA_MEM2MEM_Test();
+    //JJJ_DEBUG CK_AHBDMA_UART_Test();
+    printf("\nEnd Synopsys AHB DMA Controller Test. . . \n");
 }
 
 
