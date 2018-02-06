@@ -318,8 +318,8 @@ void DMAMem2PeripheralOpen(CK_UINT8 channel, CK_UINT32 src_addr, CK_UINT32 count
     switch(peripheral_ID)
 	{		
 		case peripheral_uart0_tx:
-			channel_info.sarx =  (U32)src_addr;		
-			channel_info.darx =  (U32)UART_THR;
+			channel_info.sarx =  (CK_UINT32)src_addr;		
+			channel_info.darx =  (CK_UINT32)UART_THR;
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE1 | 
 								 DMAC_CTL_DEST_MSIZE1 | DMAC_CTL_SINC_INC | 
@@ -330,8 +330,8 @@ void DMAMem2PeripheralOpen(CK_UINT8 channel, CK_UINT32 src_addr, CK_UINT32 count
 			break;
 			
 		case peripheral_spi_master_tx:
-			channel_info.sarx =  (U32)src_addr;		
-			//JJJ_DEBUGchannel_info.darx =  (U32)SPI_TXREG;	//JJJ_DEBUG
+			channel_info.sarx =  (CK_UINT32)src_addr;		
+			//JJJ_DEBUGchannel_info.darx =  (CK_UINT32)SPI_TXREG;	//JJJ_DEBUG
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE4 | 
 								 DMAC_CTL_DEST_MSIZE4 | DMAC_CTL_SINC_INC | 
