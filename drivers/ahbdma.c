@@ -1,7 +1,7 @@
 
 #include "ck810.h"
 #include "intc.h"
-#include "axidma.h"
+#include "ahbdma.h"
 #include "datatype.h"
 
 //#include "uart.h"
