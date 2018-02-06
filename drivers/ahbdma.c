@@ -488,14 +488,15 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 
 #define MEM_TEST_L	0x1000  //0x2000//8K
 
-void dmac_app()
+void CK_AHBDMA_Test()
 {
 		unsigned int data_flag,val,loop,SRC,DEST,BurstL,TRWidth;
 		unsigned int *pSource,*pDest;
 		pSource = (unsigned int *)0xF0008000;//0xF0000000 ;
 		pDest = (unsigned int *)0xF000C000;//0xF0008000;
       
-		printf("  Dma_APP  \r\n");
+		printf("\nSynopsys AHB DMA Controller Test. . . \n");
+
 		for(TRWidth = 1;TRWidth<5;(TRWidth*=2))
 		{
 			for(loop = 0;loop < (MEM_TEST_L/2);loop++)//clear 2*Mem_test_l memory

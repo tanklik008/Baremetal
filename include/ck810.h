@@ -74,7 +74,7 @@
 #define CK_POWM_ADDRBASE			(volatile CK_UINT32 *)(0x10002000+PERI_BASE)
 
 /** Define DMA control base address **/
-#define CK_AHB_DMAC_CONTROL_BASEADDR	(volatile CK_UINT32 *)(0xFC100000+PERI_BASE)
+#define CK_AHB_DMA_CONTROL      	(volatile CK_UINT32 *)(0xFC100000+PERI_BASE)
 
 /****** USBD  *************/
 #define CK_USBD_ADDRBASE			(volatile CK_UINT32 *)(0x10005000+PERI_BASE)
@@ -184,12 +184,12 @@
 #define PCK_PINMUX_Control			(volatile CK_UINT32 *)(0xFC209000+PERI_BASE)
 
 /***** GPIO *****/
-#define PCK_GPIO_Control			(volatile CK_UINT32 *)(0xFC300000+PERI_BASE)
+#define CK_GPIO_Control			    (volatile CK_UINT32 *)(0xFC300000+PERI_BASE)
 
 /****** SPI *************/
 #define CK_SPI_ADDRBASE0			(volatile CK_UINT32 *)(0x1001A000+PERI_BASE)
 
 /****** AXI DMA *************/
-#define PCK_AXI_DMA_Control			(volatile CK_UINT32 *)(0xFC500000+PERI_BASE)
+#define CK_AXI_DMA_Control			(volatile CK_UINT32 *)(0xFC500000+PERI_BASE)
 
 #endif /* __INCLUDE_CK5A6_H */

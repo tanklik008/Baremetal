@@ -68,7 +68,7 @@ int dataset[] = {
 };
 int dataset1[257];
 
-ZDMA_Controller_Cfg_Type DmaCtrlCfg ALIGN_4 = { (PZDMA_Reg_Type)CK_AHB_DMAC_CONTROL_BASEADDR, ZDMA_NUM_CHANNELS};
+ZDMA_Controller_Cfg_Type DmaCtrlCfg ALIGN_4 = { (PZDMA_Reg_Type)CK_AXI_DMA_Control, ZDMA_NUM_CHANNELS};
 ZDMA_Channel_Cfg_Type    DmaChanCfg ALIGN_4; // Configures the channel object.
 ZDMA_Chan_Obj_Type       DmaChanObj ALIGN_4; // This holds the DMA descriptor.
 
