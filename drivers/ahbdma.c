@@ -12,12 +12,31 @@
 //#include "iis.h"
 //#include "w25n01.h"
 
-#define UART_THR CK_UART_ADDR0 + 0x00
+#define UART0_THR (CK_UART_ADDR0 + 0x00)
+#define MEM2MEM2MEM_TEST_L	    0x1000
+#define MEM2UART0_TEST_L        0x24
+#define MEM_TEST_SRC            0x20000000
+#define MEM_TEST_DEST           0x20004000
+// Channle 0 and 1
+#define DMA_CH01_MAX_BLK_SIZE   127
+// Channel 2 - 7
+#define DMA_CH27_MAX_BLK_SIZE   63
+#define DMA_CHANNEL_0           0
+#define DMA_CHANNEL_1           1
+#define DMA_CHANNEL_2           2
+
 //********************************************************************
 //  Punsigned charlic data
 //********************************************************************
 volatile unsigned int DMAC_INT_Flag;
 
+static CK_UINT32 test_mem_data[] = {
+    0x00112233, 0x44556677, 0x8899aabb, 0xccddeeff
+};
+
+static CK_UINT8 test_char_data[] = {
+	'V','e','r','i','S','i','l','i','c','o','n', '\n'
+};
 
 //****************************************************************
 //DMAC initial
@@ -113,9 +132,6 @@ void DMAC_Open (DMAC_CH_INFO * channel, unsigned int channel_number, unsigned sh
 	DMAC_Interrupt_en (DMAC_INTERRUPT_BLOCK);
     #endif
 	DMAC_Cfg (channel, channel_number, BlockSize);
-
-			
-
 } 
 
 
@@ -167,7 +183,6 @@ void DMAC_Cfg (DMAC_CH_INFO * channel, unsigned int channel_number, unsigned sho
 	printf(" read_mreg32 (0x%x)  = 0x%x\r\n ",DMAC_SGR(channel_number),read_mreg32 (DMAC_SGR(channel_number)));
 	printf(" read_mreg32 (0x%x)  = 0x%x\r\n ",DMAC_DSR(channel_number),read_mreg32 (DMAC_DSR(channel_number)));
 	printf(" read_mreg32 (0x%x)  = 0x%x\r\n ",DMAC_LLP(channel_number),read_mreg32 (DMAC_LLP(channel_number)));
-	
 }
 
 void DMAC_Start (unsigned int channel_number)
@@ -319,7 +334,7 @@ void DMAMem2PeripheralOpen(CK_UINT8 channel, CK_UINT32 src_addr, CK_UINT32 count
 	{		
 		case peripheral_uart0_tx:
 			channel_info.sarx =  (CK_UINT32)src_addr;		
-			channel_info.darx =  (CK_UINT32)UART_THR;
+			channel_info.darx =  (CK_UINT32)UART0_THR;
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_M2P_DW | DMAC_CTL_SRC_MSIZE1 | 
 								 DMAC_CTL_DEST_MSIZE1 | DMAC_CTL_SINC_INC | 
@@ -365,7 +380,7 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 	switch(peripheral_ID)
 	{	
 		 case peripheral_uart0_rx:
-			channel_info.sarx =  (CK_UINT32)UART_THR;
+			channel_info.sarx =  (CK_UINT32)UART0_THR;
 			channel_info.darx =  (CK_UINT32)des_addr;		
 			channel_info.ctlHx = count;			
 			channel_info.ctlLx = DMAC_CTL_P2M_DW | DMAC_CTL_SRC_MSIZE4 | 
@@ -397,52 +412,34 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 } 
 
 
-#define MEM_TEST_L	        0x1000  //0x2000//8K
-#define MEM_TEST_SRC        0x20000000
-#define MEM_TEST_DEST       0x20004000
+
 
 
 /*JJJ_DEBUG>>
-void CK_AHBDMA_MEM2UART_Test(void)
+void CK_AHBDMA_MEM2UART0_Test(void)
 {
-    u32 i;
+    int loop, i;
+
     UART_INFO uartinfo_default= {BR115200,DATAWIDTH_8,STOP_ONE,PARITY_NO,0,1};
-	unsigned char T[] = {
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n',
-	'V','e','r','i','s','i','l','i','c','o','n','V','e','r','i','s','i','l','i','c','o','n'
-	};
-	for (i=0;i<0x30*6;i++)
-	{
-	 write_mreg8(0xF0008000+i,T[i]);
-	}
+
+    printf("  1.	Memory to UART0 Transfer. . . \n");
+
+    // Init test memory area
+    for(loop = 0;loop < MEM2UART0_TEST_L; loop += 12) {
+        for (i = 0; i < 12; i++)
+            write_mreg8((MEM_TEST_SRC + loop + i), test_char_data[i]);
+    }
+
+    // Configure channel 0 to transfer data
     DMAC_Init();
-    DMAMem2PeripheralOpen(CHANNEL_WR, 0xF0008000, 0x30*6, peripheral_uart1_tx,  1, 0);
-    DMAC_Start(CHANNEL_WR); 
+    DMAMem2PeripheralOpen(DMA_CHANNEL_0, MEM_TEST_SRC, MEM2UART0_TEST_L, peripheral_uart1_tx,  1, 0);
+    DMAC_Start(DMA_CHANNEL_0); 
     Uart_SetParameter(&uartinfo_default);
-    while(!(DMAC_CheckDone(CHANNEL_WR)));
-    DMAC_Close(CHANNEL_WR); 
+    while(!(DMAC_CheckDone(DMA_CHANNEL_0)));
+    DMAC_Close(DMA_CHANNEL_0); 
 }
 
-void CK_AHBDMA_UART2MEM_Test(void)
+void CK_AHBDMA_UART02MEM_Test(void)
 {
     UART_INFO uartinfo_default= {BR115200,DATAWIDTH_8,STOP_ONE,PARITY_NO,0,1}; 
 	DMAC_Init();
@@ -455,10 +452,80 @@ void CK_AHBDMA_UART2MEM_Test(void)
 
 void CK_AHBDMA_UART_Test(void)
 {
-	CK_AHBDMA_MEM2UART_Test();
-	CK_AHBDMA_UART2MEM_Test();
+	CK_AHBDMA_MEM2UART0_Test();
+	CK_AHBDMA_UART02MEM_Test();
 }
 <<JJJ_DEBUG*/
+
+void JJJ_CK_AHBDMA_MEM2MEM_Test() {
+    unsigned int data_flag,rest_val,loop,SRC,DEST;
+    int i;
+    
+	printf("  1.	Memory to Memory Transfer. . . \n");
+    
+    // Init test memory area
+    for(loop = 0;loop < MEM2MEM_TEST_L; loop += 16) {
+        for (i = 0; i < 4; i++)
+            write_mreg32((MEM_TEST_SRC + loop + i * 4), test_mem_data[i]);
+    }
+    
+    // Configure channel 0 to transfer data
+    rest_val = MEM2MEM_TEST_L;
+    SRC = MEM_TEST_SRC;
+    DEST = MEM_TEST_DEST;
+    DMAC_Init();
+    
+    printf("        	Transfer %d bytes from address 0x%x to 0x%x\n", MEM2MEM_TEST_L, MEM_TEST_SRC, MEM_TEST_DEST);
+    
+    while(1) {
+        if(rest_val > (DMA_CH01_MAX_BLK_SIZE * 4)) {
+            #if CK_AHBDMA_DEBUG
+                printf("JJJ_DEBUG Rest 0x%x bytes > (DMA_CH01_MAX_BLK_SIZE * 4) 0x%x bytes\n", rest_val, DMA_CH01_MAX_BLK_SIZE * 4);
+            #endif
+            DMAMem2MemOpen(DMA_CHANNEL_0, SRC, DEST, DMA_CH01_MAX_BLK_SIZE, 0, 4);
+            DMAC_Start(DMA_CHANNEL_0);
+    
+            printf ("read_mreg32 (DMAC_DMA_COMP_PARAM_1) =0x%x  \r\n  ",read_mreg32 (DMAC_DMA_COMP_PARAM_1));
+            while(!(DMAC_CheckDone(DMA_CHANNEL_0)));
+            rest_val -= (DMA_CH01_MAX_BLK_SIZE * 4);
+            SRC += (DMA_CH01_MAX_BLK_SIZE * 4);
+            DEST += (DMA_CH01_MAX_BLK_SIZE * 4);
+        } else {
+            #if CK_AHBDMA_DEBUG
+                printf("JJJ_DEBUG Rest 0x%x bytes < (DMA_CH01_MAX_BLK_SIZE * 4) 0x%x bytes\n", rest_val, DMA_CH01_MAX_BLK_SIZE * 4);
+            #endif
+            DMAMem2MemOpen(DMA_CHANNEL_0, SRC, DEST, (rest_val / 4), 0, 4);
+            DMAC_Start(DMA_CHANNEL_0);
+            rest_val = 0;
+            break;
+        }
+    }
+    
+    printf("        	Transfer Done\n");
+    while(!(DMAC_CheckDone(DMA_CHANNEL_0)));
+    DMAC_Close(DMA_CHANNEL_0);
+
+    printf("        	Compare transfer data value\n");
+    
+    data_flag = 0;
+    for(loop = 0;loop < MEM2MEM_TEST_L; loop += 16) {
+        for (i = 0; i < 4; i++) {
+            if (read_mreg32(MEM_TEST_SRC + loop + i * 4) != test_mem_data[i]) {
+                #if CK_AHBDMA_DEBUG
+                    printf("        	    Address 0x%x value 0x%x != 0x%x\n", MEM_TEST_SRC + loop + i * 4, read_mreg32(MEM_TEST_SRC + loop + i * 4), test_mem_data[i]);
+                #endif
+                data_flag = 1;
+            }
+        }
+    }
+    
+    if (data_flag == 0)
+        printf("        	    - - - PASS.\n");
+    else
+        printf("        	    - - - FAILURE.\n");
+    
+    printf("    	Memory to Memory Transfer Done\n");
+}
 
 void CK_AHBDMA_MEM2MEM_Test() {
     unsigned int data_flag,val,loop,SRC,DEST,BurstL,TRWidth;
@@ -466,17 +533,17 @@ void CK_AHBDMA_MEM2MEM_Test() {
 	pSource = (unsigned int *)MEM_TEST_SRC;
 	pDest = (unsigned int *)MEM_TEST_DEST;
     
-	printf("\nSynopsys AHB DMA Controller Test. . . \n");
-
+	printf("  1.	Memory to Memory Transfer. . . \n");
+    
 	for(TRWidth = 1;TRWidth<5;(TRWidth*=2))
 	{
-		for(loop = 0;loop < (MEM_TEST_L/2);loop++)//clear 2*Mem_test_l memory
+		for(loop = 0;loop < (MEM2MEM_TEST_L/2);loop++)//clear 2*MEM2MEM_TEST_L memory
 		{
 			*pSource = 0;
 			pSource ++ ;
 		}
 		pSource = (unsigned int *)MEM_TEST_SRC;
-		for(loop = 0;loop < (MEM_TEST_L/4);loop++)
+		for(loop = 0;loop < (MEM2MEM_TEST_L/4);loop++)
 		{
 			*pSource = (CK_UINT32)pSource ;//rand();
 			*pDest  =  0 ;
@@ -486,7 +553,7 @@ void CK_AHBDMA_MEM2MEM_Test() {
 		pSource = (unsigned int *)(MEM_TEST_DEST - 0x1000);
 		BurstL = 63 ;//DMAC_BLK_SIZE_256 ;  //DMAC_BLK_SIZE_256;
 
-		val = MEM_TEST_L;//Bytes
+		val = MEM2MEM_TEST_L;//Bytes
 		SRC = MEM_TEST_SRC;
 		DEST = MEM_TEST_DEST;
 		DMAC_Init();
@@ -495,23 +562,25 @@ void CK_AHBDMA_MEM2MEM_Test() {
 		{
 				if(val > (BurstL*TRWidth))
 				{
-				        printf("  Dma_APP  val > (BurstL*TRWidth) [[ 0x%x  >  0x%x * 0x%x  ]]  \r\n",val,BurstL,TRWidth);
-						DMAMem2MemOpen(0,SRC,DEST,BurstL,0,TRWidth);
-						DMAC_Start(0);
+                    #if CK_AHBDMA_DEBUG
+                        printf("JJJ_DEBUG val > (BurstL*TRWidth) [[ 0x%x  >  0x%x * 0x%x  ]]  \r\n",val,BurstL,TRWidth);
+                    #endif
+					DMAMem2MemOpen(0,SRC,DEST,BurstL,0,TRWidth);
+					DMAC_Start(0);
 
-						printf ("read_mreg32 (DMAC_DMA_COMP_PARAM_1) =0x%x  \r\n  ",read_mreg32 (DMAC_DMA_COMP_PARAM_1));
-						while(!(DMAC_CheckDone(0)));
-						val -= (BurstL*TRWidth);
-						SRC += (BurstL*TRWidth);
-						DEST += (BurstL*TRWidth);
+					printf ("read_mreg32 (DMAC_DMA_COMP_PARAM_1) =0x%x  \r\n  ",read_mreg32 (DMAC_DMA_COMP_PARAM_1));
+					while(!(DMAC_CheckDone(0)));
+					val -= (BurstL*TRWidth);
+					SRC += (BurstL*TRWidth);
+					DEST += (BurstL*TRWidth);
 				}
 				else
 				{
-				        printf("  Dma_APP  val <= (BurstL*TRWidth)   \r\n");
-						DMAMem2MemOpen(0,SRC,DEST,(val/TRWidth),0,TRWidth);
-						DMAC_Start(0);
-						val = 0;
-						break;
+				    printf("  Dma_APP  val <= (BurstL*TRWidth)   \r\n");
+					DMAMem2MemOpen(0,SRC,DEST,(val/TRWidth),0,TRWidth);
+					DMAC_Start(0);
+					val = 0;
+					break;
 				}
 		}
 		while(!(DMAC_CheckDone(0)));
@@ -519,7 +588,7 @@ void CK_AHBDMA_MEM2MEM_Test() {
 		pSource = (unsigned int *)MEM_TEST_SRC;
 		pDest = (unsigned int *)MEM_TEST_DEST;
 		data_flag = 0;
-		for(loop = 0;loop < (MEM_TEST_L/4);loop++)
+		for(loop = 0;loop < (MEM2MEM_TEST_L/4);loop++)
 		{
 			if(*pSource == (*pDest))
 			{
@@ -534,15 +603,16 @@ void CK_AHBDMA_MEM2MEM_Test() {
 			pSource++;
 			pDest++;
 		}
-		printf("width:%ld£¬data correct rate:%%%ld!\r\n",TRWidth,((100-(data_flag*100)/MEM_TEST_L)));
+		printf("width:%ld£¬data correct rate:%%%ld!\r\n",TRWidth,((100-(data_flag*100)/MEM2MEM_TEST_L)));
 	   }
-	   printf("FINISH  Dma_APP  \r\n");
+	   printf("    	Memory to Memory Transfer Done\n");
 }
 
 void CK_AHBDMA_Test()
 {
     printf("\nSynopsys AHB DMA Controller Test. . . \n");
 	CK_AHBDMA_MEM2MEM_Test();
+    JJJ_CK_AHBDMA_MEM2MEM_Test();
     //JJJ_DEBUG CK_AHBDMA_UART_Test();
     printf("\nEnd Synopsys AHB DMA Controller Test. . . \n");
 }
