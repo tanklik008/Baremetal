@@ -13,7 +13,7 @@
 //#include "w25n01.h"
 
 #define UART0_THR (CK_UART_ADDR0 + 0x00)
-#define MEM2MEM2MEM_TEST_L	    0x1000
+#define MEM2MEM_TEST_L	        0x1000
 #define MEM2UART0_TEST_L        0x24
 #define MEM_TEST_SRC            0x20000000
 #define MEM_TEST_DEST           0x20004000
@@ -527,6 +527,7 @@ void JJJ_CK_AHBDMA_MEM2MEM_Test() {
     printf("    	Memory to Memory Transfer Done\n");
 }
 
+/*JJJ_DEBUG>>
 void CK_AHBDMA_MEM2MEM_Test() {
     unsigned int data_flag,val,loop,SRC,DEST,BurstL,TRWidth;
 	unsigned int *pSource,*pDest;
@@ -537,7 +538,7 @@ void CK_AHBDMA_MEM2MEM_Test() {
     
 	for(TRWidth = 1;TRWidth<5;(TRWidth*=2))
 	{
-		for(loop = 0;loop < (MEM2MEM_TEST_L/2);loop++)//clear 2*MEM2MEM_TEST_L memory
+		for(loop = 0;loop < (MEM2MEM_TEST_L /2);loop++)//clear 2*MEM2MEM_TEST_L memory
 		{
 			*pSource = 0;
 			pSource ++ ;
@@ -607,11 +608,12 @@ void CK_AHBDMA_MEM2MEM_Test() {
 	   }
 	   printf("    	Memory to Memory Transfer Done\n");
 }
+<<JJJ_DEBUG*/
 
 void CK_AHBDMA_Test()
 {
     printf("\nSynopsys AHB DMA Controller Test. . . \n");
-	CK_AHBDMA_MEM2MEM_Test();
+	//CK_AHBDMA_MEM2MEM_Test();
     JJJ_CK_AHBDMA_MEM2MEM_Test();
     //JJJ_DEBUG CK_AHBDMA_UART_Test();
     printf("\nEnd Synopsys AHB DMA Controller Test. . . \n");
