@@ -74,8 +74,8 @@
 #define CK_POWM_ADDRBASE			(volatile CK_UINT32 *)(0x10002000+PERI_BASE)
 
 /** Define DMA control base address **/
-#define CK_AHB_DMA_TEST             1
-#define CK_AHBDMA_DEBUG             1
+#define CK_AHB_DMA_TEST             0
+#define CK_AHBDMA_DEBUG             0
 //JJJ_DEBUG#define CK_AHB_DMA_CONTROL      	(volatile CK_UINT32 *)(0xFC100000+PERI_BASE)
 #define CK_AHB_DMA_CONTROL      	0xFC100000 + PERI_BASE
 
@@ -98,14 +98,14 @@
 /**** APB ****/
 /***** Intc ******/
 #define CK_INTC_TEST                0
-#define CK_INTC_DEBUG               0
+#define CK_INTC_DEBUG               1
 #if CONFIG_QEMU
 #define CK_INTC_BASEADDRESS			(0x10010000+PERI_BASE)
 #else
 // For deepeye1000_DDR3_rdy_bp2_0118.bit
-//#define CK_INTC_BASEADDRESS			(0xFC20D000+PERI_BASE)
+#define CK_INTC_BASEADDRESS			(0xFC20D000+PERI_BASE)
 // For fpga_top_deepeye1000_0201.bit
-#define CK_INTC_BASEADDRESS			(0xFC600000+PERI_BASE)
+//#define CK_INTC_BASEADDRESS			(0xFC600000+PERI_BASE)
 #endif
 
 //to enable INTC!
@@ -136,7 +136,10 @@
 #define  CK_INTC_SPI_SLAVE      20
 #if CONFIG_QEMU     
 #define  CK_INTC_UART0          16
-#else       
+#else
+// For deepeye1000_DDR3_rdy_bp2_0118.bit
+//#define  CK_INTC_UART0          20
+// fpga_top_deepeye1000_bp2_0207.bit
 #define  CK_INTC_UART0          21
 #endif      
 #define  CK_INTC_UART1          22
@@ -148,7 +151,7 @@
 #define  CK_INTC_TIM0           28
 #define  CK_INTC_TIM1           29
 #define  CK_INTC_TIM2           30
-#define  CK_INTC_TIM3           31
+#define  CK_INTC_TIM3           31 
 #define  CK_INTC_WDT0           32
 #define  CK_INTC_WDT1           33
 #define  CK_INTC_WDT2           34
@@ -165,6 +168,8 @@
 #define  CK_TIMER3_BASSADDR			(volatile CK_UINT32 *)(0xFC203000+PERI_BASE)
 
 /****** WDT *************/
+#define CK_WDT_TEST                 1
+#define CK_WDT_DEBUG                1
 #define CK_WDT_ADDRBASE0			(volatile CK_UINT32 *)(0xFC204000+PERI_BASE)
 #define CK_WDT_ADDRBASE1			(volatile CK_UINT32 *)(0xFC205000+PERI_BASE)
 #define CK_WDT_ADDRBASE2			(volatile CK_UINT32 *)(0xFC206000+PERI_BASE)

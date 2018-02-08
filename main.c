@@ -21,6 +21,7 @@ extern void CK_Exception_Init (void);
 extern void CK_INTC_Init(IN CK_UINT32 mode);
 extern void CK_UART_Test();
 extern void CK_Timer_Test();
+extern void CK_Watchdog_Test();
 
 static void CK_Console_CallBack(CK_INT8 error)
 {   
@@ -75,6 +76,11 @@ int main ( void )
             CK_AHBDMA_Test();
         #endif
         
+        #if CK_WDT_TEST
+            CK_WDT_Init();
+            CK_Watchdog_Test();
+        #endif
+
         #if CK_INTC_TEST
             // Test will reconfigure the INTC, so it should be the last test
             CK_INTC_Test();
