@@ -17,22 +17,22 @@
 /* define the registers structure of the interrupt controller */
 typedef struct CKS_INTC
 {
-  CK_REG    ICR_ISR;//0x00
-  CK_REG    Rev0;	//0x04
-  CK_REG    IFRL;	//0x08
-  CK_REG    IPRL;	//0x0c
-  CK_REG    NIERL;	//0x10
-  CK_REG    NIPRL;	//0x14
-  CK_REG    FIERL;	//0x18
-  CK_REG    FIPRL;	//0x1c
-  CK_REG    IFRH;	//0x20
-  CK_REG    IPRH;	//0x24
-  CK_REG    NIERH;	//0x28
-  CK_REG    NIPRH;	//0x2c
-  CK_REG    FIERH;	//0x30
-  CK_REG    FIPRH;	//0x34
-  CK_REG    Rev[2];	//0x38 - 0x3c
-  CK_REG    PR[16];	//0x40 - 0x7f
+    volatile CK_REG    ICR_ISR;//0x00
+    volatile CK_REG    Rev0;	//0x04
+    volatile CK_REG    IFRL;	//0x08
+    volatile CK_REG    IPRL;	//0x0c
+    volatile CK_REG    NIERL;	//0x10
+    volatile CK_REG    NIPRL;	//0x14
+    volatile CK_REG    FIERL;	//0x18
+    volatile CK_REG    FIPRL;	//0x1c
+    volatile CK_REG    IFRH;	//0x20
+    volatile CK_REG    IPRH;	//0x24
+    volatile CK_REG    NIERH;	//0x28
+    volatile CK_REG    NIPRH;	//0x2c
+    volatile CK_REG    FIERH;	//0x30
+    volatile CK_REG    FIPRH;	//0x34
+    volatile CK_REG    Rev[2];	//0x38 - 0x3c
+    volatile CK_REG    PR[16];	//0x40 - 0x7f
 }CKStruct_INTC, *PCKStruct_INTC;
 
  
