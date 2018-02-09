@@ -73,6 +73,10 @@
 #define CK_UART1_IRQID    CK_INTC_UART1
 #define CK_UART2_IRQID    CK_INTC_UART2
 
+#define CK_UART_DMA_MODE_SEL    (1UL << 3)
+#define CK_UART_DMA_MODE0       0
+#define CK_UART_DMA_MODE1       1
+
 /*config the uart */
 
 #define CK_UART_TXBUFFERSIZE 4096

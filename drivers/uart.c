@@ -690,6 +690,34 @@ void CK_UART_ClearRxBuffer(CK_Uart_Device uartid)
   CK_CircleBuffer_Clear(&(info->rxcirclebuffer));
 }
 
-
+/*
+ * This function is used to change the dma mode of uart.
+ * Parameters:
+ * uartid--a basepointer, could be one of UART0, UART1, UART2 or UART3.
+ * mode--the DMA mode. 0 -- mode 0; 1 -- mode 1
+ * return: NULL
+*/
+void CK_Uart_Set_DMA_Mode(
+  CK_Uart_Device uartid, 
+  CK_UINT32 mode
+)
+{
+    CKStruct_UartInfo *info;
+	
+    info = &(CK_Uart_Table[uartid]);
+    
+    switch(mode) {
+        case 0:
+            // Set UART to DMA mode 0
+            info->addr[CK_UART_FCR] &= ~CK_UART_DMA_MODE_SEL;
+            break;
+        case 1:
+            // Set UART to DMA mode 1
+            info->addr[CK_UART_FCR] |= CK_UART_DMA_MODE_SEL;
+            break;
+        default:
+            printf("error: unsupported DMA mode %d", mode);
+    }
+}
 
 

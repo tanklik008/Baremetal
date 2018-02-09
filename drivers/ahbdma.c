@@ -4,7 +4,8 @@
 #include "ahbdma.h"
 #include "datatype.h"
 
-//#include "uart.h"
+#include "uart.h"
+#include "ckuart.h"
 //#include "spi.h"
 //#include "config.h"
 //#include "nand.h"
@@ -415,14 +416,12 @@ void DMAPeripheral2MemOpen(CK_UINT8 channel,CK_UINT32 des_addr,CK_UINT32 count,C
 
 
 
-/*JJJ_DEBUG>>
+
 void CK_AHBDMA_MEM2UART0_Test(void)
 {
     int loop, i;
 
-    UART_INFO uartinfo_default= {BR115200,DATAWIDTH_8,STOP_ONE,PARITY_NO,0,1};
-
-    printf("  1.	Memory to UART0 Transfer. . . \n");
+    printf("  2.	Memory to UART0 Transfer. . . \n");
 
     // Init test memory area
     for(loop = 0;loop < MEM2UART0_TEST_L; loop += 12) {
@@ -430,22 +429,25 @@ void CK_AHBDMA_MEM2UART0_Test(void)
             write_mreg8((MEM_TEST_SRC + loop + i), test_char_data[i]);
     }
 
+    // Set UART0 to DMA mode 0
+    CK_Uart_Set_DMA_Mode(0, CK_UART_DMA_MODE0);
     // Configure channel 0 to transfer data
     DMAC_Init();
     DMAMem2PeripheralOpen(DMA_CHANNEL_0, MEM_TEST_SRC, MEM2UART0_TEST_L, peripheral_uart1_tx,  1, 0);
     DMAC_Start(DMA_CHANNEL_0); 
-    Uart_SetParameter(&uartinfo_default);
     while(!(DMAC_CheckDone(DMA_CHANNEL_0)));
     DMAC_Close(DMA_CHANNEL_0); 
 }
 
 void CK_AHBDMA_UART02MEM_Test(void)
 {
-    UART_INFO uartinfo_default= {BR115200,DATAWIDTH_8,STOP_ONE,PARITY_NO,0,1}; 
+    // Set UART0 to DMA mode 1
+    CK_Uart_Set_DMA_Mode(0, CK_UART_DMA_MODE1);
+
+    printf("  3.	UART0 to Memory Transfer. . . \n");
 	DMAC_Init();
     DMAPeripheral2MemOpen(CHANNEL_RD, 0xF0006000, 0x30*6, peripheral_uart1_rx,  1, 0);
     DMAC_Start(CHANNEL_RD); 
-    Uart_SetParameter(&uartinfo_default);
     while(!(DMAC_CheckDone(CHANNEL_RD)));
     DMAC_Close(CHANNEL_RD); 
 }
@@ -455,9 +457,9 @@ void CK_AHBDMA_UART_Test(void)
 	CK_AHBDMA_MEM2UART0_Test();
 	CK_AHBDMA_UART02MEM_Test();
 }
-<<JJJ_DEBUG*/
 
-void JJJ_CK_AHBDMA_MEM2MEM_Test() {
+
+void CK_AHBDMA_MEM2MEM_Test() {
     unsigned int data_flag,rest_val,loop,SRC,DEST;
     int i;
     
@@ -527,95 +529,11 @@ void JJJ_CK_AHBDMA_MEM2MEM_Test() {
     printf("    	Memory to Memory Transfer Done\n");
 }
 
-/*JJJ_DEBUG>>
-void CK_AHBDMA_MEM2MEM_Test() {
-    unsigned int data_flag,val,loop,SRC,DEST,BurstL,TRWidth;
-	unsigned int *pSource,*pDest;
-	pSource = (unsigned int *)MEM_TEST_SRC;
-	pDest = (unsigned int *)MEM_TEST_DEST;
-    
-	printf("  1.	Memory to Memory Transfer. . . \n");
-    
-	for(TRWidth = 1;TRWidth<5;(TRWidth*=2))
-	{
-		for(loop = 0;loop < (MEM2MEM_TEST_L /2);loop++)//clear 2*MEM2MEM_TEST_L memory
-		{
-			*pSource = 0;
-			pSource ++ ;
-		}
-		pSource = (unsigned int *)MEM_TEST_SRC;
-		for(loop = 0;loop < (MEM2MEM_TEST_L/4);loop++)
-		{
-			*pSource = (CK_UINT32)pSource ;//rand();
-			*pDest  =  0 ;
-			pSource ++ ;
-			pDest ++;
-		}		
-		pSource = (unsigned int *)(MEM_TEST_DEST - 0x1000);
-		BurstL = 63 ;//DMAC_BLK_SIZE_256 ;  //DMAC_BLK_SIZE_256;
-
-		val = MEM2MEM_TEST_L;//Bytes
-		SRC = MEM_TEST_SRC;
-		DEST = MEM_TEST_DEST;
-		DMAC_Init();
-		TRWidth  =  4 ;
-		while(1)
-		{
-				if(val > (BurstL*TRWidth))
-				{
-                    #if CK_AHBDMA_DEBUG
-                        printf("JJJ_DEBUG val > (BurstL*TRWidth) [[ 0x%x  >  0x%x * 0x%x  ]]  \r\n",val,BurstL,TRWidth);
-                    #endif
-					DMAMem2MemOpen(0,SRC,DEST,BurstL,0,TRWidth);
-					DMAC_Start(0);
-
-					printf ("read_mreg32 (DMAC_DMA_COMP_PARAM_1) =0x%x  \r\n  ",read_mreg32 (DMAC_DMA_COMP_PARAM_1));
-					while(!(DMAC_CheckDone(0)));
-					val -= (BurstL*TRWidth);
-					SRC += (BurstL*TRWidth);
-					DEST += (BurstL*TRWidth);
-				}
-				else
-				{
-				    printf("  Dma_APP  val <= (BurstL*TRWidth)   \r\n");
-					DMAMem2MemOpen(0,SRC,DEST,(val/TRWidth),0,TRWidth);
-					DMAC_Start(0);
-					val = 0;
-					break;
-				}
-		}
-		while(!(DMAC_CheckDone(0)));
-		DMAC_Close(0);
-		pSource = (unsigned int *)MEM_TEST_SRC;
-		pDest = (unsigned int *)MEM_TEST_DEST;
-		data_flag = 0;
-		for(loop = 0;loop < (MEM2MEM_TEST_L/4);loop++)
-		{
-			if(*pSource == (*pDest))
-			{
-				
-			}
-			else
-			{
-				printf("\r\nerror at:0x%lx%\r\n",loop);
-				data_flag ++;
-				return ;
-			}
-			pSource++;
-			pDest++;
-		}
-		printf("width:%ld£¬data correct rate:%%%ld!\r\n",TRWidth,((100-(data_flag*100)/MEM2MEM_TEST_L)));
-	   }
-	   printf("    	Memory to Memory Transfer Done\n");
-}
-<<JJJ_DEBUG*/
-
 void CK_AHBDMA_Test()
 {
     printf("\nSynopsys AHB DMA Controller Test. . . \n");
-	//CK_AHBDMA_MEM2MEM_Test();
-    JJJ_CK_AHBDMA_MEM2MEM_Test();
-    //JJJ_DEBUG CK_AHBDMA_UART_Test();
+    CK_AHBDMA_MEM2MEM_Test();
+    CK_AHBDMA_UART_Test();
     printf("\nEnd Synopsys AHB DMA Controller Test. . . \n");
 }
 

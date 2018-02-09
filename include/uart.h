@@ -204,6 +204,8 @@ void CK_Uart_StartDMARxTx (void);
 
 void CK_UART_ClearRxBuffer(CK_Uart_Device uartid);
 
+void CK_Uart_Set_DMA_Mode(CK_Uart_Device uartid, CK_UINT32 mode);
+
 /* This function is used to get character,in query mode or interrupt mode*/
 CK_INT32 CK_Uart_GetCharUnBlock(IN CK_Uart_Device uartid, OUT CK_UINT8 *ch);
 #endif
